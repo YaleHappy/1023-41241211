@@ -237,6 +237,9 @@ canvas.addEventListener("touchmove", function(e) {
         let comboBonus = 0; // 連擊加分
         let particles = [];
         let isJumping = false;  // 防止連續跳躍
+        let originalPaddleY = paddleY;  // 保存初始擋板的 Y 位置
+        let jumpHeight = 50;  // 定義跳躍高度
+        let jumpDuration = 500;  // 定義跳躍持續時間（毫秒）
 
         // 獲取 Modal 和按鈕
         const modal = document.getElementById("gameDescriptionModal");
