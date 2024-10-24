@@ -428,6 +428,12 @@ function startGame(brickArrangement = null) {
     // **重置球的速度為初始值**
     resetSpeed();  // 每次開始遊戲時重置速度
 
+    
+    // 播放背景音樂
+    const backgroundMusic = document.getElementById("backgroundMusic");
+    backgroundMusic.play();  // 播放音樂
+    backgroundMusic.volume = 0.5;  // 設置音量 (0.0 到 1.0)
+    
     // 根據選擇的難度來設定磚塊參數
     if (difficulty === "easy") {
         brickRowCount = 3;
