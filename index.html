@@ -45,7 +45,20 @@
     border-color: #28a745; /* 被選中的縮略圖會有綠色框 */
 }
 
+// 支持觸控控制擋板移動
+canvas.addEventListener("touchstart", function(e) {
+    let touchX = e.touches[0].clientX - canvas.offsetLeft;
+    if (touchX > 0 && touchX < canvas.width) {
+        paddleX = touchX - paddleWidth / 2;
+    }
+}, false);
 
+canvas.addEventListener("touchmove", function(e) {
+    let touchX = e.touches[0].clientX - canvas.offsetLeft;
+    if (touchX > 0 && touchX < canvas.width) {
+        paddleX = touchX - paddleWidth / 2;
+    }
+}, false);
 /* 隱藏 Modal 預設狀態 */
 .modal {
     display: none;
