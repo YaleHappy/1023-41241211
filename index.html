@@ -44,6 +44,50 @@
 .background-thumbnail.active {
     border-color: #28a745; /* 被選中的縮略圖會有綠色框 */
 }
+
+
+/* 隱藏 Modal 預設狀態 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);  /* 背景透明度 */
+}
+
+/* Modal 內容區塊 */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    text-align: left;
+}
+
+/* 關閉按鈕 */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+
+
+
     </style>
 
 </head>
@@ -72,22 +116,60 @@
             <button class="btn btn-info" id="level1Btn">Level 1</button>
             <button class="btn btn-info" id="level2Btn">Level 2</button>
             <button class="btn btn-info" id="level3Btn">Level 3</button>
+            <button id="openModalBtn" class="btn btn-info">遊戲說明</button>
+
         </div>
 
         <audio id="backgroundMusic" src="music/背景音樂.mp3" loop></audio>
         <audio id="hitSound" src="music/擊打音效.mp3"></audio>
         
-        <!-- 開始遊戲按鈕 -->
-        <button id="startBtn" class="btn btn-primary btn-lg">開始遊戲</button>
 
         <!-- 遊戲畫布 -->
         <canvas id="gameCanvas" width="480" height="320"></canvas>
     </div>
+     <!-- 開始遊戲按鈕 -->
+     <button id="startBtn" class="btn btn-primary btn-lg">開始遊戲</button>
 
     <!-- Bootstrap 5.3.3 JavaScript Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- 自定義遊戲程式碼 -->
+
+<!-- Modal (彈出視窗) -->
+<div id="gameDescriptionModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>打磚塊遊戲說明</h2>
+        <p>
+            歡迎來到打磚塊遊戲！這是一款經典的街機遊戲，考驗你的反應速度和精準度。以下是遊戲的詳細說明和操作指南：
+            <br><br>
+            <strong>遊戲目標：</strong><br>
+            在遊戲中，你需要控制底部的擋板，反彈小球並擊碎上方的所有磚塊。當所有磚塊被擊碎時，你將過關並進入下一個更具挑戰性的關卡。如果小球掉到底部，你會失去一條生命，當生命全部用完時，遊戲結束。
+            <br><br>
+            <strong>遊戲規則：</strong><br>
+            1. 每次反彈小球擊中磚塊時，得1分，部分磚塊可能需要多次擊打才能完全破壞。<br>
+            2. 每當你獲得三分，可能會觸發特別獎勵，如延長時間或增加生命。<br>
+            3. 遊戲分為三個不同的難度等級（簡單、中等、困難），每個難度有三個關卡。<br>
+            4. 成功通過所有關卡後，總分數將顯示，並且你可以重新挑戰。
+            <br><br>
+            <strong>操作方法：</strong><br>
+            - 使用左箭頭和右箭頭控制擋板左右移動，或使用滑鼠移動來精確控制擋板位置。<br>
+            - 左鍵點擊：擋板向上跳動。<br>
+            - 右鍵點擊：擋板向下移動。
+            <br><br>
+            <strong>特別功能：</strong><br>
+            - <strong>時間限制：</strong> 每一關卡有固定的時間限制，當時間耗盡時遊戲結束。<br>
+            - <strong>連擊加分：</strong> 連擊數，一次以下多得一分。兩次以上多得三分，提升你的最終得分。
+            <br><br>
+            <strong>挑戰自己：</strong><br>
+            來挑戰不同的難度並打破你的最高得分吧！
+            <br><br>
+            祝你好運，玩得開心！
+        </p>
+    </div>
+</div>
+
+    
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
@@ -141,8 +223,27 @@
         let comboCount = 0; // 連擊計數
         let comboBonus = 0; // 連擊加分
         let particles = [];
+        // 獲取 Modal 和按鈕
+        const modal = document.getElementById("gameDescriptionModal");
+        const btn = document.getElementById("openModalBtn");
+        const closeModal = document.getElementsByClassName("close")[0];
 
+        // 點擊按鈕開啟 Modal
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
 
+        // 點擊 X 關閉 Modal
+        closeModal.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // 點擊 Modal 外部區域關閉
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
 
         const easyLevels = [
             {
@@ -1191,7 +1292,7 @@ function updateParticles() {
     particles = particles.filter(p => p.alpha > 0);
 }
 
-    </script>
 
-</body>
-</html>
+
+
+    </script>
