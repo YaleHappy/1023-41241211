@@ -204,7 +204,7 @@
         let score = 0;
         let isGameOver = false;  // 遊戲結束狀態
         let currentLevel = 1;
-        let lives = 3;  // 初始生命數
+        let lives = 200;  // 初始生命數
         let trail = [];  // 存儲球的歷史位置
         let maxTrailLength = 20;  // 尾跡的最大長度
         let timeLimit = 60;  // 時間限制，單位為秒
@@ -510,7 +510,7 @@ function startGame(brickArrangement = null) {
     isGameOver = false;
     isLevelComplete = false;
     timeRemaining = timeLimit;  // 重置剩餘時間
-    lives = 3;  // 設定初始生命值為 3
+    lives =200;  // 設定初始生命值為 3
     // 保留原來的分數，這裡不再重置 score = 0;
 
     // 隱藏按鈕和選項
@@ -943,7 +943,7 @@ function collisionDetection() {
         function restartGame() {
     // 重置遊戲狀態
     score = 0;
-    lives = 3;
+    lives = 200;
     timeRemaining = timeLimit;  // 重置時間
     nextRewardScore = scoreThreshold;  // 重置獎勵門檻
     isGameOver = false;
@@ -1073,7 +1073,7 @@ function moveToNextLevel() {
 function resetGame() {
     // 重置相關的狀態
     score = 0;
-    lives = 3;
+    lives = 200;
     isLevelComplete = false;  // 重置過關狀態
 }
 
