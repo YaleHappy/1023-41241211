@@ -236,6 +236,8 @@ canvas.addEventListener("touchmove", function(e) {
         let comboCount = 0; // 連擊計數
         let comboBonus = 0; // 連擊加分
         let particles = [];
+        let isJumping = false;  // 防止連續跳躍
+
         // 獲取 Modal 和按鈕
         const modal = document.getElementById("gameDescriptionModal");
         const btn = document.getElementById("openModalBtn");
@@ -471,9 +473,18 @@ currentBackground.src = backgroundImages.night;  // 預設為夜空
 
 // 檢測滑鼠點擊進行擋板跳躍
 canvas.addEventListener("mousedown", function(e) {
-    if (!canJump) return;  // 如果還在冷卻中，則不允許跳躍
+    if (e.button === 0 && !isJumping) {  // 只有當不在跳躍時才能跳
+        isJumping = true;
+        paddleY = Math.max(paddleY - jumpHeight, 0);  // 向上跳躍
 
-    if (e.button === 0) {  // 左鍵點擊，向上移動擋板
+        // 設定延遲讓擋板回到原位
+        setTimeout(function() {
+            paddleY = originalPaddleY;  // 回到原位
+            isJumping = false;  // 完成跳躍，允許再次跳躍
+        }, jumpDuration);
+    }
+}, false);
+        
         paddleY = Math.max(paddleY - paddleJumpDistance, 0);  // 防止超出上邊界
     } else if (e.button === 2) {  // 右鍵點擊，向下移動擋板
         paddleY = Math.min(paddleY + paddleJumpDistance, canvas.height - paddleHeight);  // 防止超出下邊界
