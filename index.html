@@ -472,6 +472,7 @@ currentBackground.src = backgroundImages.night;  // 預設為夜空
 
 
 // 檢測滑鼠點擊進行擋板跳躍
+
 canvas.addEventListener("mousedown", function(e) {
     if (e.button === 0 && !isJumping) {  // 只有當不在跳躍時才能跳
         isJumping = true;
@@ -484,11 +485,6 @@ canvas.addEventListener("mousedown", function(e) {
         }, jumpDuration);
     }
 }, false);
-        
-        paddleY = Math.max(paddleY - paddleJumpDistance, 0);  // 防止超出上邊界
-    } else if (e.button === 2) {  // 右鍵點擊，向下移動擋板
-        paddleY = Math.min(paddleY + paddleJumpDistance, canvas.height - paddleHeight);  // 防止超出下邊界
-    }
 
     // 開啟冷卻時間
     canJump = false;
