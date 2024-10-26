@@ -722,6 +722,13 @@ function drawGameOver() {
     backgroundMusic.pause();
     backgroundMusic.currentTime = 0;
 
+    // 停止動畫和計時器
+    cancelAnimationFrame(animationId);
+    clearInterval(timerInterval);
+
+    // 清空畫布
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     // 使用 SweetAlert2 顯示遊戲結束的彈窗
     Swal.fire({
         icon: 'error',
@@ -730,18 +737,7 @@ function drawGameOver() {
         confirmButtonText: '重新開始'
     }).then((result) => {
         if (result.isConfirmed) {
-            // 清空畫布、重置狀態，並顯示主選單
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            score = 0;
-            lives = 3;
-            isGameOver = false;  // 此時重置遊戲結束狀態
-
-            // 顯示選擇按鈕
-            document.getElementById("difficultyButtons").style.display = "block";
-            document.getElementById("levelButtons").style.display = "block";
-            startBtn.style.display = "block";
-
-            restartGame();  // 重新開始遊戲
+            resetGameToMenu();  // 回到主選單並重置所有設定
         }
     });
 }
@@ -842,16 +838,30 @@ function draw() {
 
 
 
+let isBallFalling = false;  // 新增變數來記錄球是否正在掉落
+
 function resetBall() {
+    if (isBallFalling) return;  // 如果球已經掉落，不再重置生命值
+    isBallFalling = true;  // 標記球正在掉落
+
+    // 重置球的位置和速度
     x = canvas.width / 2;
     y = canvas.height - 30;
     dx = 2;
-    dy = -2;  // 初始垂直方向
-    lives--;  // 生命值減少，但不重置分數
+    dy = -2;
+
+    // 扣除一條生命
+    lives--;
+
+    // 若生命值為0，設置遊戲結束標記
     if (lives === 0) {
-        isGameOver = true;  // 如果生命值為 0，則遊戲結束
+        isGameOver = true;
     }
-    isLevelComplete = false;  // 重置過關狀態
+
+    // 在 0.5 秒後重置掉落標記，允許下一次檢查
+    setTimeout(() => {
+        isBallFalling = false;
+    }, 500);  // 500 毫秒延遲
 }
 
 
@@ -1238,11 +1248,10 @@ function resetGameToMenu() {
     document.getElementById("levelButtons").style.display = "block";
     startBtn.style.display = "block";
 
-    // 清除舊事件
-    startBtn.removeEventListener("click", startGame);
-
-    // 綁定新的開始事件
-    startBtn.addEventListener("click", function () {
+    // 清除舊事件，並重新綁定一次 startBtn 的點擊事件
+    startBtn.removeEventListener("click", startGame); // 避免多次綁定
+    startBtn.addEventListener("click", () => {
+        // 檢查難度和關卡是否選擇
         if (!difficulty) {
             Swal.fire({
                 icon: 'warning',
@@ -1265,31 +1274,32 @@ function resetGameToMenu() {
 
 
 
-// 新增一個重置按鈕樣式的函數
+
+
+
+// 完整的 resetButtons 函數，包含按鈕樣式和狀態重置
 function resetButtons() {
-    // 移除難度按鈕的 "active" 樣式
-    document.getElementById("easyBtn").classList.remove("active");
-    document.getElementById("mediumBtn").classList.remove("active");
-    document.getElementById("hardBtn").classList.remove("active");
+    // 獲取難度和關卡按鈕元素
+    const difficultyButtons = ["easyBtn", "mediumBtn", "hardBtn"];
+    const levelButtons = ["level1Btn", "level2Btn", "level3Btn"];
 
-    // 移除關卡按鈕的 "active" 樣式
-    document.getElementById("level1Btn").classList.remove("active");
-    document.getElementById("level2Btn").classList.remove("active");
-    document.getElementById("level3Btn").classList.remove("active");
-}
+    // 移除難度按鈕的 "active" 樣式並啟用按鈕
+    difficultyButtons.forEach(id => {
+        const btn = document.getElementById(id);
+        btn.classList.remove("active");
+        btn.disabled = false; // 確保按鈕處於啟用狀態
+    });
 
+    // 移除關卡按鈕的 "active" 樣式並啟用按鈕
+    levelButtons.forEach(id => {
+        const btn = document.getElementById(id);
+        btn.classList.remove("active");
+        btn.disabled = false; // 確保按鈕處於啟用狀態
+    });
 
-// 新增一個重置按鈕樣式的函數
-function resetButtons() {
-    // 移除難度按鈕的 "active" 樣式
-    document.getElementById("easyBtn").classList.remove("active");
-    document.getElementById("mediumBtn").classList.remove("active");
-    document.getElementById("hardBtn").classList.remove("active");
-
-    // 移除關卡按鈕的 "active" 樣式
-    document.getElementById("level1Btn").classList.remove("active");
-    document.getElementById("level2Btn").classList.remove("active");
-    document.getElementById("level3Btn").classList.remove("active");
+    // 顯示難度和關卡選擇按鈕容器
+    document.getElementById("difficultyButtons").style.display = "block";
+    document.getElementById("levelButtons").style.display = "block";
 }
 
 
