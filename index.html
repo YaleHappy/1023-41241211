@@ -154,6 +154,67 @@
 }
 
 
+    /* 彈出式背景選擇容器樣式 */
+    .background-modal {
+        display: none;
+        position: fixed;
+        z-index: 10;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .background-modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    .background-modal-content .close {
+        color: #aaa;
+        float: right;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .background-modal-content .close:hover {
+        color: #000;
+    }
+
+    .background-list {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .background-option {
+        width: 100px;
+        height: 100px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.2s;
+    }
+
+    .background-option:hover {
+        transform: scale(1.1);
+        border-color: #28a745;
+    }
+    
+    #backgroundSelectBtn {
+    position: absolute; /* 絕對定位 */
+    bottom: 23%; /* 距離畫布底部20px */
+    left: 56.5%; /* 距離畫布右側20px */
+    z-index: 10; /* 確保按鈕在畫布之上 */
+}
+
 
 
     </style>
@@ -224,6 +285,27 @@
     </div>
 </div>
 
+<!-- 新增選擇背景的按鈕 -->
+<button id="backgroundSelectBtn" class="btn btn-secondary">選擇網頁背景</button>
+
+<!-- 背景清單的彈出式容器 -->
+<div id="backgroundListModal" class="background-modal">
+    <div class="background-modal-content">
+        <span class="close">&times;</span>
+        <h2>選擇背景</h2>
+        <div id="backgroundList" class="background-list">
+            <img src="htmlbackground/夕陽.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/夕陽.jpg">
+            <img src="htmlbackground/天空.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/天空.jpg">
+            <img src="htmlbackground/月亮.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/月亮.jpg">
+            <img src="htmlbackground/雪地.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/雪地.jpg">
+            <img src="htmlbackground/雲海.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/雲海.jpg">
+            <img src="htmlbackground/櫻花.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/櫻花.jpg">
+
+
+            <!-- 可以添加更多圖片選項 -->
+        </div>
+    </div>
+</div>
 <!-- Modal (彈出視窗) -->
 <div id="gameDescriptionModal" class="modal">
     <div class="modal-content">
@@ -326,7 +408,11 @@
         // 音樂清單元素
         const musicList = document.getElementById("musicList");
         const backgroundMusic = document.getElementById("backgroundMusic");
-
+        // 背景選擇按鈕和彈出選單的 DOM 元素
+        const backgroundSelectBtn = document.getElementById("backgroundSelectBtn");
+        const backgroundListModal = document.getElementById("backgroundListModal");
+        const backgroundOptions = document.querySelectorAll(".background-option");
+        const closeBackgroundModal = document.querySelector(".background-modal-content .close");
         
         
 
@@ -457,6 +543,37 @@ const hardLevels = [
         ]
     }
 ];
+
+
+// 當玩家點擊「選擇背景」按鈕時，顯示背景選擇選單
+backgroundSelectBtn.addEventListener("click", () => {
+    backgroundListModal.style.display = "block";
+});
+
+// 點擊每個背景選項更改畫布外背景
+backgroundOptions.forEach(option => {
+    option.addEventListener("click", () => {
+        const selectedBackground = option.getAttribute("data-background");
+
+        // 將選取的背景圖應用至畫布的外部背景
+        document.body.style.backgroundImage = `url(${selectedBackground})`;
+        document.body.style.backgroundSize = "cover"; // 調整背景圖案大小
+
+        // 關閉背景選單
+        backgroundListModal.style.display = "none";
+    });
+});
+
+// 點擊 X 按鈕或背景模態框外部區域關閉選單
+closeBackgroundModal.addEventListener("click", () => {
+    backgroundListModal.style.display = "none";
+});
+
+window.addEventListener("click", (event) => {
+    if (event.target === backgroundListModal) {
+        backgroundListModal.style.display = "none";
+    }
+});
 
 // 選擇背景的事件邏輯
 document.getElementById("nightThumbnail").addEventListener("click", function() {
