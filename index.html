@@ -420,7 +420,11 @@
                 
         
         
-
+        // 頁面載入時自動設定預設背景圖片
+        document.addEventListener("DOMContentLoaded", function() {
+            document.body.style.backgroundImage = "url('htmlbackground/月亮.jpg')";
+            document.body.style.backgroundSize = "cover"; // 設置背景大小
+        });
 
         // 點擊按鈕開啟 Modal
         btn.onclick = function() {
@@ -793,6 +797,11 @@ function startGame(brickArrangement = null) {
     console.log("Game started with arrangement:", brickArrangement);
     canvas.style.display = "block";  // 顯示畫布
 
+        // 初始化獎勵相關的狀態
+    nextRewardScore = scoreThreshold;  // 重置獎勵門檻
+
+
+
     // 初始化遊戲狀態
     isGameOver = false;
     isLevelComplete = false;
@@ -1101,29 +1110,14 @@ function draw() {
 
 let isBallFalling = false;  // 新增變數來記錄球是否正在掉落
 
+// 重置球的位置和速度，但不再扣除生命
 function resetBall() {
-    if (isBallFalling) return;  // 如果球已經掉落，不再重置生命值
-    isBallFalling = true;  // 標記球正在掉落
-
-    // 重置球的位置和速度
     x = canvas.width / 2;
     y = canvas.height - 30;
     dx = 2;
     dy = -2;
-
-    // 扣除一條生命
-    lives--;
-
-    // 若生命值為0，設置遊戲結束標記
-    if (lives === 0) {
-        isGameOver = true;
-    }
-
-    // 在 0.5 秒後重置掉落標記，允許下一次檢查
-    setTimeout(() => {
-        isBallFalling = false;
-    }, 500);  // 500 毫秒延遲
 }
+
 
 
 
@@ -1259,11 +1253,19 @@ function collisionDetection() {
         function restartGame() {
     // 重置遊戲狀態
     score = 0;
-    lives = 3;  // 僅在重啟遊戲時重置生命值
+    lives = 3;
+    timeRemaining = timeLimit;
     isGameOver = false;
     isLevelComplete = false;
     selectedLevelIndex = null;  
     difficulty = null;  
+
+    // 重置 combo 計數器
+    comboCount = 0;
+    comboBonus = 0;
+
+    // 重置獎勵機制的計數器
+    nextRewardScore = scoreThreshold;
 
     // 顯示難度和關卡選擇按鈕
     document.getElementById("difficultyButtons").style.display = "block";
@@ -1271,7 +1273,6 @@ function collisionDetection() {
     startBtn.style.display = "block";
 
     startBtn.removeEventListener("click", startGame);
-
     startBtn.addEventListener("click", function () {
         if (!difficulty) {
             alert("請選擇難度！");
@@ -1283,7 +1284,9 @@ function collisionDetection() {
         }
         startGame();
     });
-}   
+}
+
+
 
 
 
@@ -1394,16 +1397,16 @@ function drawTimer() {
 
 
 function checkForReward() {
-    // 當分數大於或等於下一次獎勵門檻時，發放獎勵
+    // 當分數達到下一次獎勵門檻時，發放獎勵
     if (score >= nextRewardScore) {
         // 更新下一次獎勵的分數門檻
         nextRewardScore += scoreThreshold;
 
-        // 隨機選擇延長時間還是增加生命
+        // 隨機選擇延長時間或增加生命
         const reward = Math.random() < 0.5 ? 'time' : 'life';
 
         if (reward === 'time') {
-            extendTime();  // 延長遊戲時間
+            extendTime();  // 增加時間
         } else {
             addLife();  // 增加生命
         }
@@ -1414,19 +1417,16 @@ function checkForReward() {
 
 
 
-// 增加時間的處理
+
+
 function extendTime() {
-    timeRemaining += 10;  // 延長10秒
-    // 確保時間不會超過初始時間限制的兩倍
-    let maxTimeLimit = timeLimit * 2; 
+    timeRemaining += 10;  // 增加10秒
+    let maxTimeLimit = timeLimit * 2;  // 設置最大時間限制
     if (timeRemaining > maxTimeLimit) {
         timeRemaining = maxTimeLimit;
     }
 }
 
-
-
-// 增加生命的處理
 function addLife() {
     lives++;  // 增加一條生命
 }
@@ -1462,13 +1462,14 @@ function startNextLevel() {
         selectedLevel = hardLevels[selectedLevelIndex];
     }
 
-    // 重置球的速度和位置
+    // 重置球的位置和速度，但保留 comboCount
     resetSpeed();
     x = canvas.width / 2;
     y = canvas.height - 30;
-    isRunning = false;  // 強制重置狀態
-    startGame(selectedLevel.brickArrangement);  // 傳入新的磚塊排列，開始下一關
+    isRunning = false;
+    startGame(selectedLevel.brickArrangement); // 傳入新的磚塊排列，開始下一關
 }
+
 
 
 function resetGameToMenu() {
@@ -1508,6 +1509,10 @@ function resetGameToMenu() {
     document.getElementById("difficultyButtons").style.display = "block";
     document.getElementById("levelButtons").style.display = "block";
     startBtn.style.display = "block";
+
+        // 重置 combo 計數器
+        comboCount = 0;
+    comboBonus = 0;
 
     // 清除舊事件，並重新綁定一次 startBtn 的點擊事件
     startBtn.removeEventListener("click", startGame); // 避免多次綁定
@@ -1597,18 +1602,16 @@ function checkPaddleCollision() {
 }
 
 
-// 在球掉到底部時重置連擊
+// 檢查球是否掉到底部，並重置連擊
 function checkBallFall() {
     if (y + ballRadius > canvas.height) {
-        lives--;
+        lives--;  // 只在這裡扣除一條生命
         comboCount = 0;  // 重置 combo 計數
 
         if (lives === 0) {
             isGameOver = true;  // 生命用完，遊戲結束
         } else {
             resetBall();  // 重置球的位置和速度
-            comboCount = 0;  // 重置 Combo 計數
-            dy = -dy;  // 讓球反彈回來
         }
     }
 }
