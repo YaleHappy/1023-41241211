@@ -488,7 +488,6 @@ closeModal.addEventListener("click", () => {
     musicListModal.style.display = "none";
 });
 
-// 點擊清單中音樂名稱來播放音樂
 musicList.addEventListener("click", (event) => {
     if (event.target.tagName === "LI") {
         const musicFile = event.target.getAttribute("data-music");
@@ -498,10 +497,15 @@ musicList.addEventListener("click", (event) => {
         backgroundMusic.src = musicFile;
         backgroundMusic.play();
 
+        // 更新控制按鈕為播放狀態的圖標
+        musicControlBtn.src = "image/播放狀態.jpg";
+        isMusicPlaying = true;
+
         // 關閉音樂清單
         musicListModal.style.display = "none";
     }
 });
+
 
 // 點擊模態框外部時關閉
 window.addEventListener("click", (event) => {
@@ -695,6 +699,9 @@ function startGame(brickArrangement = null) {
 
     // 播放背景音樂
     const backgroundMusic = document.getElementById("backgroundMusic");
+    if (!backgroundMusic.src) {
+        backgroundMusic.src = "music/GODS.mp3";  // 設置預設音樂
+    }
     backgroundMusic.play();
     backgroundMusic.volume = 0.5;
 
@@ -726,6 +733,7 @@ function startGame(brickArrangement = null) {
     // 開始繪製遊戲畫面
     draw();
 }
+
 
 
 
@@ -1540,6 +1548,7 @@ function toggleMusic() {
     }
     isMusicPlaying = !isMusicPlaying;  // 切換狀態
 }
+
 
 
     </script>
