@@ -260,6 +260,48 @@
     color: #000;
 }
 
+#leaderboardModal .modal-content {
+    padding: 30px; /* 增加內距，讓背景變大 */
+    margin: 20px auto; /* 控制外距 */
+    max-width: 90vw; /* 限制寬度，不超出視窗 */
+    max-height: 80vh; /* 限制高度，不超出視窗 */
+    overflow-y: auto; /* 垂直滾動條 */
+    overflow-x: auto; /* 水平滾動條 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影增加層次感 */
+    border-radius: 10px; /* 圓角樣式 */
+    background-color: #fff; /* 背景顏色 */
+}
+
+/* 排行榜內容樣式 */
+.leaderboard-modal-content {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%; /* 設定彈出視窗的寬度，例如 80% 的螢幕寬度 */
+    max-width: 600px; /* 設定最大寬度，防止彈出視窗過大 */
+    max-height: 90%; /* 設定最大高度，防止彈出視窗過高 */
+    overflow-y: auto; /* 當內容過多時允許垂直滾動 */
+
+}
+/* 清除排行榜按鈕樣式 */
+.btn-clear {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 5px;
+    border-radius: 10px;
+    font-size: 20px;
+    margin-right: 20px; /* 調整按鈕向左偏移 */
+
+    
+    
+}
+
+.btn-clear:hover {
+    background-color: #c9302c;
+}
     </style>
 
 </head>
@@ -283,12 +325,19 @@
                             <th>排名</th>
                             <th>玩家名稱</th>
                             <th>分數</th>
+                            <th>難度</th>
+                            <th>關卡</th>
+                            <th>生命數</th>
+                            <th>完成時間</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
+                    <button id="clearLeaderboardBtn" class="btn-clear">清除排行榜</button>
+
                 </table>
             </div>
         </div>
+        
 
         <div id="backgroundImages class="text-center my-3">
             <img src="background/夜空縮略圖.png" id="nightThumbnail" class="background-thumbnail" alt="夜空" />
@@ -387,8 +436,7 @@
             <br><br>
             <strong>操作方法：</strong><br>
             - 使用左箭頭和右箭頭控制擋板左右移動，或使用滑鼠移動來精確控制擋板位置。<br>
-            - 左鍵點擊：擋板向上跳動。<br>
-            - 右鍵點擊：擋板向下移動。
+            - 左鍵點擊：擋板跳躍。<br>
             <br><br>
             <strong>特別功能：</strong><br>
             - <strong>時間限制：</strong> 每一關卡有固定的時間限制，當時間耗盡時遊戲結束。<br>
@@ -466,6 +514,7 @@
         const musicSelectBtn = document.getElementById("musicSelectBtn");
         const musicListModal = document.getElementById("musicListModal");
         const closeModal = document.querySelector(".modal .close");
+        const leaderboardDataKey = 'leaderboardData';
 
 
         // 音樂清單元素
@@ -479,6 +528,7 @@
         const leaderboardBtn = document.getElementById("leaderboardBtn");
         const leaderboardModal = document.getElementById("leaderboardModal");
         const closeLeaderboardModal = document.querySelector(".leaderboard-modal-content .close");
+        
 
         // 點擊排行榜按鈕顯示排行榜
         leaderboardBtn.addEventListener("click", () => {
@@ -498,7 +548,12 @@
             }
         });
                 
-        
+        window.addEventListener("click", (event) => {
+    if (event.target === musicListModal) {
+        musicListModal.style.display = "none";
+    }
+});
+
                 
         
         
@@ -634,6 +689,32 @@ const hardLevels = [
     }
 ];
 
+// 清除排行榜按鈕事件
+// 清除排行榜按鈕事件
+document.getElementById('clearLeaderboardBtn').addEventListener('click', () => {
+    Swal.fire({
+        title: '確定清除排行榜？',
+        text: '此操作將會刪除所有的排行榜記錄，無法復原。',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '確定',
+        cancelButtonText: '取消'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // 確認 localStorage 中的鍵名是否一致
+            localStorage.removeItem('leaderboard');
+
+            // 清空表格內容
+            const leaderboardBody = document.getElementById('leaderboard').querySelector("tbody");
+            leaderboardBody.innerHTML = '';
+
+            // 顯示成功訊息
+            Swal.fire('已清除!', '排行榜已經被清空。', 'success');
+        }
+    });
+});
+
+
 
 // 當玩家點擊「選擇背景」按鈕時，顯示背景選擇選單
 backgroundSelectBtn.addEventListener("click", () => {
@@ -685,10 +766,24 @@ function highlightSelectedThumbnail(selectedThumbnailId) {
 }
 
 
-// 打開音樂清單
+// 音樂彈窗的打開與關閉事件
 musicSelectBtn.addEventListener("click", () => {
     musicListModal.style.display = "block";
 });
+
+// 音樂清單彈窗的關閉按鈕
+const musicModalCloseBtn = document.querySelector("#musicListModal .close");
+musicModalCloseBtn.addEventListener("click", () => {
+    musicListModal.style.display = "none";
+});
+
+// 點擊彈窗外部關閉音樂清單彈窗
+window.addEventListener("click", (event) => {
+    if (event.target === musicListModal) {
+        musicListModal.style.display = "none";
+    }
+});
+
 
 // 關閉音樂清單
 closeModal.addEventListener("click", () => {
@@ -1407,6 +1502,8 @@ function drawLevelComplete() {
         moveToNextLevel();
     }, 2000);  // 延遲2秒後開始下一關
 }
+
+
 function handleLevelComplete() {
     isLevelComplete = true;
     drawLevelComplete();  // 顯示過關訊息
@@ -1417,40 +1514,39 @@ function handleLevelComplete() {
 
     setTimeout(() => {
         if (selectedLevelIndex < 2) {  
-            // 若未達到最後一關，進入下一關
             selectedLevelIndex++;
-            isRunning = false;  // 避免重複啟動遊戲
-            startNextLevel();  // 開始下一關
+            isRunning = false;
+            startNextLevel();
         } else {
-            // 若已經完成最後一關，詢問是否保存紀錄
+            // 已完成最後一關時提示保存紀錄
             Swal.fire({
                 icon: 'success',
                 title: '恭喜通關！',
-                text: `你已完成所有關卡！\n總分數：${score}，最終生命值：${lives}\n是否保存分數紀錄？`,
+                text: `你已完成所有關卡！\n總分數：${score}，最終生命值：${lives}`,
                 showCancelButton: true,
-                confirmButtonText: '是，保存紀錄',
-                cancelButtonText: '不用了'
+                confirmButtonText: '保存紀錄',
+                cancelButtonText: '不保存'
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
-                        title: '請輸入您的名字',
+                        title: '請輸入你的名字',
                         input: 'text',
-                        inputPlaceholder: '輸入名字',
-                        confirmButtonText: '保存',
                         showCancelButton: true,
-                    }).then((nameResult) => {
-                        if (nameResult.isConfirmed) {
-                            saveScore(nameResult.value, score);  // 保存分數
-                            updateLeaderboard();  // 更新排行榜
+                        confirmButtonText: '保存',
+                        cancelButtonText: '取消'
+                    }).then((inputResult) => {
+                        if (inputResult.value) {
+                            saveScore(inputResult.value, score);
+                            updateLeaderboard();
                         }
-                        resetGameToMenu();  // 無論保存與否，回到主選單
+                        resetGameToMenu();
                     });
                 } else {
-                    resetGameToMenu();  // 如果不保存紀錄，直接回到主選單
+                    resetGameToMenu();
                 }
             });
         }
-    }, 2000);  // 延遲2秒後顯示保存選項或進入下一關
+    }, 2000);
 }
 
 
@@ -1775,36 +1871,103 @@ function toggleMusic() {
 }
 
 
-// 保存分數至 localStorage
-function saveScore(playerName, playerScore) {
-    let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-    leaderboard.push({ name: playerName, score: playerScore });
+function saveScore(playerName, score) {
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}年${String(now.getMonth() + 1).padStart(2, '0')}月${String(now.getDate()).padStart(2, '0')}日 ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-    // 按分數排序並限制前10名
+    const playerData = {
+        name: playerName,
+        score: score,
+        difficulty: difficulty,
+        level: selectedLevelIndex + 1,
+        lives: lives,
+        date: formattedDate
+    };
+
+    const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+    leaderboard.push(playerData);
     leaderboard.sort((a, b) => b.score - a.score);
-    leaderboard = leaderboard.slice(0, 10);
 
-    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
 }
 
-// 更新排行榜顯示
-function updateLeaderboard() {
-    const leaderboardTable = document.querySelector('#leaderboard tbody');
-    leaderboardTable.innerHTML = ''; // 清空現有的排行榜
 
-    const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-    leaderboard.forEach((entry, index) => {
-        const row = document.createElement('tr');
+
+function updateLeaderboard() {
+    const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+    const leaderboardBody = document.getElementById("leaderboard").querySelector("tbody");
+
+    leaderboardBody.innerHTML = "";
+
+    leaderboard.forEach((player, index) => {
+        const row = document.createElement("tr");
+
         row.innerHTML = `
             <td>${index + 1}</td>
-            <td>${entry.name}</td>
-            <td>${entry.score}</td>
+            <td>${player.name}</td>
+            <td>${player.score}</td>
+            <td>${player.difficulty}</td>
+            <td>Level ${player.level}</td>
+            <td>${player.lives}</td>
+            <td>${player.date}</td>
         `;
-        leaderboardTable.appendChild(row);
+
+        leaderboardBody.appendChild(row);
     });
 }
 
+
 // 當頁面載入時，更新排行榜
 document.addEventListener("DOMContentLoaded", updateLeaderboard);
+
+
+function saveToLeaderboard(name, score, difficulty, level, lives, date) {
+    // 取得現有排行榜資料
+    let leaderboard = JSON.parse(localStorage.getItem('leaderboardData')) || [];
+    
+    // 新增當前紀錄
+    leaderboard.push({
+        name,
+        score,
+        difficulty,
+        level,
+        lives,
+        date
+    });
+    
+    // 儲存回 localStorage
+    localStorage.setItem('leaderboardData', JSON.stringify(leaderboard));
+}
+
+function loadLeaderboard() {
+    const leaderboardTable = document.getElementById('leaderboardTable');
+    leaderboardTable.innerHTML = ''; // 先清空表格
+
+    // 讀取儲存的排行榜資料
+    const leaderboard = JSON.parse(localStorage.getItem('leaderboardData')) || [];
+
+    leaderboard.forEach((entry, index) => {
+        // 使用 HTML 來生成表格列
+        leaderboardTable.innerHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${entry.name}</td>
+                <td>${entry.score}</td>
+                <td>${entry.difficulty}</td>
+                <td>${entry.level}</td>
+                <td>${entry.lives}</td>
+                <td>${entry.date}</td>
+            </tr>
+        `;
+    });
+}
+
+document.getElementById('openLeaderboardBtn').addEventListener('click', () => {
+    loadLeaderboard();
+    document.querySelector('.leaderboard-modal').style.display = 'block';
+});
+
+
+musicListModa
 
     </script>
