@@ -90,6 +90,69 @@
     user-select: none; /* 禁用遊戲相關區域的文字選取 */
 }
 
+#musicControlBtn {
+    position: absolute;     /* 設定為絕對定位 */
+    bottom: 23%;          /* 向下移出畫布下方，根據需求調整距離 */
+    left:38.5%;              /* 將按鈕的左側設置在容器的正中間 */
+    transform: translateX(-50%); /* 用 translateX 負偏移，確保按鈕完全居中 */
+    width: 40px;            /* 控制按鈕大小 */
+    height: 40px;
+    cursor: pointer;        /* 指針變成手型 */
+}
+
+
+/* 音樂彈出式容器樣式 */
+.music-modal {
+    display: none;               /* 預設隱藏 */
+    position: fixed;
+    z-index: 0;
+    left: 10;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 背景半透明 */
+}
+
+.music-modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.music-modal-content .close {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.music-modal-content .close:hover {
+    color: #000;
+}
+
+#musicList li {
+    cursor: pointer;
+    padding: 10px;
+    list-style: none;
+    border-bottom: 1px solid #ddd;
+}
+
+#musicList li:hover {
+    background-color: #f0f0f0;
+}
+
+#musicSelectBtn {
+    position: absolute;
+    top: 695px;
+    right: calc(45% + 150px);  /* 調整 right 位置，使其與開始遊戲按鈕靠近 */
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
 
 
 
@@ -125,20 +188,41 @@
 
         </div>
 
-        <audio id="backgroundMusic" src="music/背景音樂.mp3" loop></audio>
+        <audio id="backgroundMusic" loop></audio>
         <audio id="hitSound" src="music/擊打音效.mp3"></audio>
         
 
+
+        
         <!-- 遊戲畫布 -->
         <canvas id="gameCanvas" width="480" height="320"></canvas>
     </div>
+
+    
      <!-- 開始遊戲按鈕 -->
      <button id="startBtn" class="btn btn-primary btn-lg">開始遊戲</button>
+     <img id="musicControlBtn" src="image/播放狀態.jpg" alt="播放音樂" onclick="toggleMusic()" />
 
     <!-- Bootstrap 5.3.3 JavaScript Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- 自定義遊戲程式碼 -->
+
+    <!-- 音樂選擇按鈕 -->
+<button id="musicSelectBtn" class="btn btn-secondary">選擇音樂</button>
+
+<!-- 音樂清單的彈出式容器 -->
+<div id="musicListModal" class="music-modal">
+    <div class="music-modal-content">
+        <span class="close">&times;</span>
+        <h2>選擇背景音樂</h2>
+        <ul id="musicList">
+            <li data-music="music/小點子.mp3">小點子</li>
+            <li data-music="music/GODS.mp3">GODS</li>
+            <li data-music="music/Legends Never Die.mp3">Legends Never Die</li>
+        </ul>
+    </div>
+</div>
 
 <!-- Modal (彈出視窗) -->
 <div id="gameDescriptionModal" class="modal">
@@ -231,8 +315,21 @@
         // 獲取 Modal 和按鈕
         const modal = document.getElementById("gameDescriptionModal");
         const btn = document.getElementById("openModalBtn");
-        const closeModal = document.getElementsByClassName("close")[0];
         let isRunning = false;  // 控制遊戲是否在執行中
+        const musicControlBtn = document.getElementById("musicControlBtn");
+        let isMusicPlaying = true;  // 初始狀態為播放
+        // 音樂按鈕和彈出視窗的 DOM 元素
+        const musicSelectBtn = document.getElementById("musicSelectBtn");
+        const musicListModal = document.getElementById("musicListModal");
+        const closeModal = document.querySelector(".music-modal-content .close");
+
+        // 音樂清單元素
+        const musicList = document.getElementById("musicList");
+        const backgroundMusic = document.getElementById("backgroundMusic");
+
+        
+        
+
 
 
         // 點擊按鈕開啟 Modal
@@ -379,6 +476,39 @@ function highlightSelectedThumbnail(selectedThumbnailId) {
     document.getElementById("forestThumbnail").classList.remove("active");
     document.getElementById(selectedThumbnailId).classList.add("active");
 }
+
+
+// 打開音樂清單
+musicSelectBtn.addEventListener("click", () => {
+    musicListModal.style.display = "block";
+});
+
+// 關閉音樂清單
+closeModal.addEventListener("click", () => {
+    musicListModal.style.display = "none";
+});
+
+// 點擊清單中音樂名稱來播放音樂
+musicList.addEventListener("click", (event) => {
+    if (event.target.tagName === "LI") {
+        const musicFile = event.target.getAttribute("data-music");
+
+        // 停止當前播放的音樂並播放新的音樂
+        backgroundMusic.pause();
+        backgroundMusic.src = musicFile;
+        backgroundMusic.play();
+
+        // 關閉音樂清單
+        musicListModal.style.display = "none";
+    }
+});
+
+// 點擊模態框外部時關閉
+window.addEventListener("click", (event) => {
+    if (event.target === musicListModal) {
+        musicListModal.style.display = "none";
+    }
+});
 
 // 檢查是否已選擇難度和背景來啟用關卡選擇按鈕
 function checkIfReadyToStart() {
@@ -1400,7 +1530,16 @@ function updateParticles() {
     particles = particles.filter(p => p.alpha > 0);
 }
 
-
+function toggleMusic() {
+    if (isMusicPlaying) {
+        backgroundMusic.pause();
+        musicControlBtn.src = "image/禁止播放狀態.jpg";  // 切換至禁用圖標
+    } else {
+        backgroundMusic.play();
+        musicControlBtn.src = "image/播放狀態.jpg";  // 切換至播放圖標
+    }
+    isMusicPlaying = !isMusicPlaying;  // 切換狀態
+}
 
 
     </script>
