@@ -697,12 +697,14 @@ function startGame(brickArrangement = null) {
     // 重置球的速度
     resetSpeed();
 
-    // 播放背景音樂
+    // 播放背景音樂（僅在 isMusicPlaying 為 true 時）
     const backgroundMusic = document.getElementById("backgroundMusic");
     if (!backgroundMusic.src) {
         backgroundMusic.src = "music/GODS.mp3";  // 設置預設音樂
     }
-    backgroundMusic.play();
+    if (isMusicPlaying) {  // 檢查音樂狀態是否允許播放
+        backgroundMusic.play();
+    }
     backgroundMusic.volume = 0.5;
 
     // 根據選擇的難度來設定磚塊參數
