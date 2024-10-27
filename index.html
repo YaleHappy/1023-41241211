@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>打磚塊遊戲</title>
@@ -11,10 +13,15 @@
 
     <style>
         canvas {
-            background: #eee;
-            display: block;
-            margin: 20px auto;
-        }
+        width: 90vw; /* 相對寬度 */
+        height: 70vh; /* 相對高度 */
+        background: #eee;
+        display: block;
+        margin: 20px auto;
+        max-width: 480px; /* 設置畫布最大寬度 */
+        max-height: 320px; /* 設置畫布最大高度 */
+    }
+
         #startBtn {
             display: block;
             margin: 20px auto;
@@ -971,11 +978,15 @@ function startGame(brickArrangement = null) {
 
     isRunning = true;  // 設置遊戲為運行狀態
 
+    dx = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
+    dy = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
+
     console.log("Game started with arrangement:", brickArrangement);
     canvas.style.display = "block";  // 顯示畫布
 
         // 初始化獎勵相關的狀態
     nextRewardScore = scoreThreshold;  // 重置獎勵門檻
+    
 
 
 
@@ -1287,18 +1298,21 @@ function draw() {
 
 let isBallFalling = false;  // 新增變數來記錄球是否正在掉落
 
-// 重置球的位置和速度，但不再扣除生命
 function resetBall() {
+    const canvas = document.getElementById("gameCanvas");
     x = canvas.width / 2;
     y = canvas.height - 30;
-    dx = 2;
-    dy = -2;
+
+    // 隨機初始速度
+    dx = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
+    dy = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
 }
 
-
-
-
-
+function resetPaddle() {
+    const canvas = document.getElementById("gameCanvas");
+    paddleWidth = canvas.width * 0.15; // 擋板寬度適應畫布大小
+    paddleX = (canvas.width - paddleWidth) / 2;
+}
 
 // 在碰撞檢測中增加連擊處理
 function collisionDetection() {
@@ -1961,6 +1975,39 @@ function loadLeaderboard() {
         `;
     });
 }
+
+
+function resizeCanvas() {
+    const canvas = document.getElementById("gameCanvas");
+
+    // 檢測裝置方向
+    if (window.innerHeight > window.innerWidth) {
+        // 直向模式
+        canvas.width = 320; // 調整直向的畫布寬度
+        canvas.height = 480; // 調整直向的畫布高度
+    } else {
+        // 橫向模式
+        canvas.width = 480; // 調整橫向的畫布寬度
+        canvas.height = 320; // 調整橫向的畫布高度
+    }
+
+    // 畫布縮放後重新設定遊戲元素位置，例如球和擋板的初始位置
+    resetBall(); 
+    resetPaddle();
+}
+
+// 當裝置方向或螢幕大小改變時呼叫 resizeCanvas
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("orientationchange", resizeCanvas);
+
+// 頁面載入後初次調整畫布
+document.addEventListener("DOMContentLoaded", resizeCanvas)
+// 當裝置方向或螢幕大小改變時呼叫 resizeCanvas
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("orientationchange", resizeCanvas);
+
+// 頁面載入後初次調整畫布
+document.addEventListener("DOMContentLoaded", resizeCanvas);
 
 document.getElementById('openLeaderboardBtn').addEventListener('click', () => {
     loadLeaderboard();
