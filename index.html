@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>打磚塊遊戲</title>
@@ -13,15 +11,10 @@
 
     <style>
         canvas {
-        width: 90vw; /* 相對寬度 */
-        height: 70vh; /* 相對高度 */
-        background: #eee;
-        display: block;
-        margin: 20px auto;
-        max-width: 480px; /* 設置畫布最大寬度 */
-        max-height: 320px; /* 設置畫布最大高度 */
-    }
-
+            background: #eee;
+            display: block;
+            margin: 20px auto;
+        }
         #startBtn {
             display: block;
             margin: 20px auto;
@@ -309,6 +302,20 @@
 .btn-clear:hover {
     background-color: #c9302c;
 }
+
+#uploadBrickThemeBtn {
+    position: absolute;
+    top: 25%;   /* 距離畫布頂部 */
+    right:34%;  /* 距離畫布右側 */
+    z-index: 15;
+}
+/* 重置按鈕樣式與位置 */
+#resetBrickThemeBtn {
+    position: absolute;
+    top: 30.8%;     /* 調整至畫布適當位置 */
+    right: 34%;    /* 距離畫布右側 */
+    z-index: 10;
+}
     </style>
 
 </head>
@@ -381,6 +388,11 @@
      <!-- 開始遊戲按鈕 -->
      <button id="startBtn" class="btn btn-primary btn-lg">開始遊戲</button>
      <img id="musicControlBtn" src="image/播放狀態.jpg" alt="播放音樂" onclick="toggleMusic()" />
+
+    <!-- 磚塊主題選擇按鈕 -->
+    <button id="uploadBrickThemeBtn" class="btn btn-secondary">自己換磚塊主題</button>
+    <button id="resetBrickThemeBtn" class="btn btn-secondary">重置為預設磚塊</button>
+    <input type="file" id="brickThemeInput" accept="image/*" style="display: none;">
 
     <!-- Bootstrap 5.3.3 JavaScript Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -465,8 +477,9 @@
         let ballRadius =10;
         let x = canvas.width / 2;
         let y = canvas.height - 30;
-        let dx = 2;
-        let dy = -2;
+        let dx = 3;  // 新的初始水平速度
+        let dy = -3;  // 新的初始垂直速度
+
 
         let paddleHeight = 10;
         let paddleWidth = 75;
@@ -535,7 +548,66 @@
         const leaderboardBtn = document.getElementById("leaderboardBtn");
         const leaderboardModal = document.getElementById("leaderboardModal");
         const closeLeaderboardModal = document.querySelector(".leaderboard-modal-content .close");
-        
+        const uploadBrickThemeBtn = document.getElementById('uploadBrickThemeBtn');
+        const brickThemeInput = document.getElementById("brickThemeInput");
+        let brickThemeImage = null; // 用於存儲磚塊主題圖片
+
+const resetBrickThemeBtn = document.getElementById('resetBrickThemeBtn'); // 假設新增了預設主題按鈕
+        // 點擊按鈕時打開文件選擇器
+        uploadBrickThemeBtn.addEventListener("click", () => {
+            brickThemeInput.click();
+        });
+
+        // 當用戶選擇文件後，讀取圖片
+        brickThemeInput.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    brickThemeImage = new Image();
+                    brickThemeImage.src = e.target.result;
+                    brickThemeImage.onload = () => {
+                        // 確保圖片加載完成後可以繪製
+                        drawBricks(); // 重新繪製磚塊以應用新圖片
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+
+        document.getElementById("brickThemeInput").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const uploadedImage = new Image();
+            uploadedImage.src = e.target.result;
+            brickThemeImage = uploadedImage;
+
+            // 保存圖片數據到 localStorage
+            localStorage.setItem("brickThemeImage", e.target.result);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+
+    document.getElementById("resetBrickThemeBtn").addEventListener("click", () => {
+        localStorage.removeItem("brickThemeImage"); // 清除 localStorage 中的圖片數據
+        brickThemeImage = null; // 重置圖片變量
+    });
+
+
+        // 頁面加載時檢查 localStorage
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem("brickThemeImage");
+        if (savedTheme) {
+            const savedImage = new Image();
+            savedImage.src = savedTheme;
+            brickThemeImage = savedImage; // 加載保存的主題圖片
+        }
+    });
 
         // 點擊排行榜按鈕顯示排行榜
         leaderboardBtn.addEventListener("click", () => {
@@ -857,6 +929,17 @@ function highlightSelectedDifficulty(selectedBtnId) {
 // 點擊按鈕開始遊戲
 // 點擊按鈕開始遊戲
 const startBtn = document.getElementById("startBtn");
+const hideElementsCheckbox = document.getElementById("hideElementsCheckbox");
+
+
+// 選擇要隱藏的元素（可以是按鈕或其他控件）
+const elementsToHide = [
+    document.getElementById("difficultyButtons"),
+    document.getElementById("levelButtons"),
+    document.getElementById("musicSelectBtn"),
+    document.getElementById("backgroundSelectBtn")
+];
+
 // 點擊按鈕開始遊戲
 startBtn.addEventListener("click", function() {
     // 檢查是否已選擇難度
@@ -878,7 +961,18 @@ startBtn.addEventListener("click", function() {
         });
         return;  // 停止遊戲開始
     }
+    
+    startBtn.addEventListener("click", function() {
+    // 檢查是否勾選「隱藏按鈕」選項
+    if (hideElementsCheckbox.checked) {
+        elementsToHide.forEach(element => {
+            element.style.display = "none"; // 隱藏元素
+        });
+    }
 
+    // 在這裡啟動遊戲的其他邏輯，例如開始遊戲
+    startGame();
+});
     // 隱藏按鈕和選項
     startBtn.style.display = "none";
     document.getElementById("difficultyButtons").style.display = "none";
@@ -974,19 +1068,25 @@ function highlightSelectedLevel(selectedBtnId) {
 }
 
 function startGame(brickArrangement = null) {
+
+
+        // 隱藏主題更換相關按鈕
+        uploadBrickThemeBtn.style.display = 'none';
+    resetBrickThemeBtn.style.display = 'none';
+
     if (isRunning) return;  // 如果遊戲已在運行，則不再重啟
 
     isRunning = true;  // 設置遊戲為運行狀態
-
-    dx = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
-    dy = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
 
     console.log("Game started with arrangement:", brickArrangement);
     canvas.style.display = "block";  // 顯示畫布
 
         // 初始化獎勵相關的狀態
     nextRewardScore = scoreThreshold;  // 重置獎勵門檻
-    
+
+    dx = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
+    dy = (Math.random() * -2 - 1);
+
 
 
 
@@ -1128,41 +1228,58 @@ function drawPaddle() {
 }
 
 
-        // 繪製磚塊，根據擊打次數改變顏色
-        function drawBricks() {
+function drawBricks() {
     for (let c = 0; c < bricks.length; c++) {
         for (let r = 0; r < bricks[c].length; r++) {
-            if (bricks[c][r].status == 1) {  // 只繪製 status == 1 的磚塊
+            if (bricks[c][r].status === 1) {  // 只繪製 status 為 1 的磚塊
                 let brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
                 let brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
                 bricks[c][r].x = brickX;
                 bricks[c][r].y = brickY;
 
-                // 根據 hitPoints 改變磚塊顏色
-                let hitPoints = bricks[c][r].hitPoints;
-                let color;
-                if (hitPoints === 3) {
-                    color = "#FF0000";  // 紅色表示需要3次擊打
-                } else if (hitPoints === 2) {
-                    color = "#FFA500";  // 橙色表示需要2次擊打
-                } else {
-                    color = "#FFFF00";  // 黃色表示需要1次擊打
-                }
-
                 ctx.beginPath();
                 ctx.rect(brickX, brickY, brickWidth, brickHeight);
-                ctx.fillStyle = color;
-                ctx.fill();
+
+                if (brickThemeImage) {
+                    // 若有上傳圖片，使用圖片作為磚塊背景並添加陰影
+                    ctx.drawImage(brickThemeImage, brickX, brickY, brickWidth, brickHeight);
+
+                    // 添加陰影
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                    ctx.shadowBlur = 5;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+                } else {
+                    // 無圖片時保持預設顏色並無陰影
+                    ctx.shadowColor = 'transparent';
+                    let hitPoints = bricks[c][r].hitPoints;
+                    let color;
+                    if (hitPoints === 3) {
+                        color = "#FF0000";  // 紅色表示需要3次擊打
+                    } else if (hitPoints === 2) {
+                        color = "#FFA500";  // 橙色表示需要2次擊打
+                    } else {
+                        color = "#FFFF00";  // 黃色表示需要1次擊打
+                    }
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                }
+                
                 ctx.closePath();
 
-                // 顯示剩餘的擊打次數
+                // 顯示擊打次數前，清除陰影以保持清晰
+                ctx.save();
+                ctx.shadowColor = 'transparent';
                 ctx.font = "16px Arial";
                 ctx.fillStyle = "#000000";
-                ctx.fillText(hitPoints, brickX + brickWidth / 2 - 5, brickY + brickHeight / 2 + 5);
+                ctx.fillText(bricks[c][r].hitPoints, brickX + brickWidth / 2 - 5, brickY + brickHeight / 2 + 5);
+                ctx.restore();
             }
         }
     }
 }
+
+
 
 
         function drawScore() {
@@ -1268,6 +1385,7 @@ function draw() {
             }
         }
 
+
         // 球掉到底部時失去一條生命
         if (y + ballRadius > canvas.height) {
             lives--;
@@ -1297,22 +1415,20 @@ function draw() {
 
 
 let isBallFalling = false;  // 新增變數來記錄球是否正在掉落
-
 function resetBall() {
-    const canvas = document.getElementById("gameCanvas");
     x = canvas.width / 2;
     y = canvas.height - 30;
 
-    // 隨機初始速度
-    dx = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
-    dy = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
+    // 隨機生成水平速度（左或右），確保垂直速度向上
+    dx = (Math.random() > 0.5 ? 1 : -1) * 2; // 隨機向左或向右
+    dy = -Math.abs(dy); // 強制垂直速度向上（確保 dy 是負值）
 }
 
-function resetPaddle() {
-    const canvas = document.getElementById("gameCanvas");
-    paddleWidth = canvas.width * 0.15; // 擋板寬度適應畫布大小
-    paddleX = (canvas.width - paddleWidth) / 2;
-}
+
+
+
+
+
 
 // 在碰撞檢測中增加連擊處理
 function collisionDetection() {
@@ -1684,6 +1800,10 @@ function startNextLevel() {
 function resetGameToMenu() {
     isRunning = false;
 
+     // 顯示主題更換相關按鈕
+     uploadBrickThemeBtn.style.display = 'block';
+    resetBrickThemeBtn.style.display = 'block';
+
     // 停止音樂
     const backgroundMusic = document.getElementById("backgroundMusic");
     backgroundMusic.pause();
@@ -1975,39 +2095,6 @@ function loadLeaderboard() {
         `;
     });
 }
-
-
-function resizeCanvas() {
-    const canvas = document.getElementById("gameCanvas");
-
-    // 檢測裝置方向
-    if (window.innerHeight > window.innerWidth) {
-        // 直向模式
-        canvas.width = 320; // 調整直向的畫布寬度
-        canvas.height = 480; // 調整直向的畫布高度
-    } else {
-        // 橫向模式
-        canvas.width = 480; // 調整橫向的畫布寬度
-        canvas.height = 320; // 調整橫向的畫布高度
-    }
-
-    // 畫布縮放後重新設定遊戲元素位置，例如球和擋板的初始位置
-    resetBall(); 
-    resetPaddle();
-}
-
-// 當裝置方向或螢幕大小改變時呼叫 resizeCanvas
-window.addEventListener("resize", resizeCanvas);
-window.addEventListener("orientationchange", resizeCanvas);
-
-// 頁面載入後初次調整畫布
-document.addEventListener("DOMContentLoaded", resizeCanvas)
-// 當裝置方向或螢幕大小改變時呼叫 resizeCanvas
-window.addEventListener("resize", resizeCanvas);
-window.addEventListener("orientationchange", resizeCanvas);
-
-// 頁面載入後初次調整畫布
-document.addEventListener("DOMContentLoaded", resizeCanvas);
 
 document.getElementById('openLeaderboardBtn').addEventListener('click', () => {
     loadLeaderboard();
