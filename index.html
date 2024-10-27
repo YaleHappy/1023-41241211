@@ -1261,39 +1261,42 @@ function drawBricks() {
                 bricks[c][r].x = brickX;
                 bricks[c][r].y = brickY;
 
+                ctx.save();  // 保存畫布狀態
                 ctx.beginPath();
                 ctx.rect(brickX, brickY, brickWidth, brickHeight);
 
                 if (brickThemeImage) {
-                    // 若有上傳圖片，使用圖片作為磚塊背景並添加陰影
-                    ctx.drawImage(brickThemeImage, brickX, brickY, brickWidth, brickHeight);
+                    // 如果有上傳圖片，將圖片分割成拼圖效果
+                    let pieceWidth = brickThemeImage.width / brickColumnCount;
+                    let pieceHeight = brickThemeImage.height / brickRowCount;
 
-                    // 添加陰影
+                    // 將圖片的片段繪製到每個磚塊上
+                    ctx.drawImage(
+                        brickThemeImage,
+                        c * pieceWidth, r * pieceHeight, // 來源圖片位置
+                        pieceWidth, pieceHeight,         // 來源圖片大小
+                        brickX, brickY,                  // 繪製位置
+                        brickWidth, brickHeight          // 繪製大小
+                    );
+
+                    // 添加陰影效果
                     ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
                     ctx.shadowBlur = 5;
                     ctx.shadowOffsetX = 2;
                     ctx.shadowOffsetY = 2;
                 } else {
-                    // 無圖片時保持預設顏色並無陰影
+                    // 無圖片時，使用顏色並無陰影
                     ctx.shadowColor = 'transparent';
-                    let hitPoints = bricks[c][r].hitPoints;
-                    let color;
-                    if (hitPoints === 3) {
-                        color = "#FF0000";  // 紅色表示需要3次擊打
-                    } else if (hitPoints === 2) {
-                        color = "#FFA500";  // 橙色表示需要2次擊打
-                    } else {
-                        color = "#FFFF00";  // 黃色表示需要1次擊打
-                    }
+                    let color = getColorByHitPoints(bricks[c][r].hitPoints);
                     ctx.fillStyle = color;
                     ctx.fill();
                 }
-                
-                ctx.closePath();
 
-                // 顯示擊打次數前，清除陰影以保持清晰
+                ctx.closePath();
+                ctx.restore();  // 還原狀態，移除陰影
+
+                // 顯示擊打次數
                 ctx.save();
-                ctx.shadowColor = 'transparent';
                 ctx.font = "16px Arial";
                 ctx.fillStyle = "#000000";
                 ctx.fillText(bricks[c][r].hitPoints, brickX + brickWidth / 2 - 5, brickY + brickHeight / 2 + 5);
@@ -1301,6 +1304,13 @@ function drawBricks() {
             }
         }
     }
+}
+
+// 幫助函數：根據磚塊的 hitPoints 返回相應顏色
+function getColorByHitPoints(hitPoints) {
+    if (hitPoints === 3) return "#FF0000";  // 紅色
+    if (hitPoints === 2) return "#FFA500";  // 橙色
+    return "#FFFF00";  // 黃色
 }
 
 
@@ -2128,4 +2138,4 @@ document.getElementById('openLeaderboardBtn').addEventListener('click', () => {
 
 musicListModa
 
-    </script>
+    </script>   
