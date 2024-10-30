@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>打磚塊遊戲</title>
     <!-- Bootstrap 5.3.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <!-- 引入 SweetAlert2 -->
+    <!-- 引入 SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
@@ -15,338 +16,432 @@
             display: block;
             margin: 20px auto;
         }
+
         #startBtn {
-            display: block;
-            margin: 20px auto;
+            position: absolute;
+            /* 如果要固定在父元素內，使用 absolute */
+            top: 75%;
+            /* 將按鈕向下移動到父容器的 50% 高度 */
+            left: 50.5%;
+            /* 將按鈕水平移動到父容器的 50% 寬度 */
+            transform: translate(-50%, -50%);
+            /* 使用 transform 讓按鈕完全置中 */
+            z-index: 1000;
+            /* 確保按鈕在最上層 */
         }
+
+
         #difficultySelect {
             margin: 20px auto;
             display: block;
         }
+
         .centered {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
         }
+
         .btn.active {
-        background-color: #28a745; /* 當按鈕被選中時顯示為綠色 */
-        color: white;
-    }
+            background-color: #28a745;
+            /* 當按鈕被選中時顯示為綠色 */
+            color: white;
+        }
 
 
-    .background-thumbnail {
-    width: 100px;
-    height: 100px;
-    margin: 10px;
-    cursor: pointer;
-    border: 2px solid transparent;
-}
+        .background-thumbnail {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
 
-.background-thumbnail.active {
-    border-color: #28a745; /* 被選中的縮略圖會有綠色框 */
-}
-
-
-.modal {
-    display: none; /* 初始隱藏 */
-    position: fixed;
-    z-index: 100;  /* 確保其位於最高層 */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
-}
+        .background-thumbnail.active {
+            border-color: #28a745;
+            /* 被選中的縮略圖會有綠色框 */
+        }
 
 
-/* Modal 內容區塊 */
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
-    text-align: left;
-}
-
-/* 關閉按鈕 */
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-#gameCanvas, #startBtn, #difficultyButtons, #levelButtons {
-    user-select: none; /* 禁用遊戲相關區域的文字選取 */
-}
-
-#musicControlBtn {
-    position: absolute;     /* 設定為絕對定位 */
-    bottom: 23%;          /* 向下移出畫布下方，根據需求調整距離 */
-    left:38.5%;              /* 將按鈕的左側設置在容器的正中間 */
-    transform: translateX(-50%); /* 用 translateX 負偏移，確保按鈕完全居中 */
-    width: 40px;            /* 控制按鈕大小 */
-    height: 40px;
-    cursor: pointer;        /* 指針變成手型 */
-}
+        .modal {
+            display: none;
+            /* 初始隱藏 */
+            position: fixed;
+            z-index: 100;
+            /* 確保其位於最高層 */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* 半透明背景 */
+        }
 
 
-/* 音樂彈出式容器樣式 */
-.music-modal {
-    display: none;               /* 預設隱藏 */
-    position: fixed;
-    z-index: 0;
-    left: 10;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* 背景半透明 */
-}
+        /* Modal 內容區塊 */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            text-align: left;
+        }
 
-.music-modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 400px;
-    text-align: center;
-}
+        /* 關閉按鈕 */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
 
-.music-modal-content .close {
-    color: #aaa;
-    float: right;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-}
-.music-modal-content .close:hover {
-    color: #000;
-}
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
 
-#musicList li {
-    cursor: pointer;
-    padding: 10px;
-    list-style: none;
-    border-bottom: 1px solid #ddd;
-}
+        #levelButtons {
+            user-select: none;
+            /* 禁用遊戲相關區域的文字選取 */
+        }
 
-#musicList li:hover {
-    background-color: #f0f0f0;
-}
-
-#musicSelectBtn {
-    position: absolute;
-    top: 695px;
-    right: calc(45% + 150px);  /* 調整 right 位置，使其與開始遊戲按鈕靠近 */
-    transform: translateX(-50%);
-    z-index: 10;
-}
+        #musicControlBtn {
+            position: absolute;
+            /* 設定為絕對定位 */
+            bottom: 23%;
+            /* 向下移出畫布下方，根據需求調整距離 */
+            left: 38.5%;
+            /* 將按鈕的左側設置在容器的正中間 */
+            transform: translateX(-50%);
+            /* 用 translateX 負偏移，確保按鈕完全居中 */
+            width: 40px;
+            /* 控制按鈕大小 */
+            height: 40px;
+            cursor: pointer;
+            /* 指針變成手型 */
+        }
 
 
-    /* 彈出式背景選擇容器樣式 */
-    .background-modal {
-        display: none;
-        position: fixed;
-        z-index: 10;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
+        /* 音樂彈出式容器樣式 */
+        .music-modal {
+            display: none;
+            /* 預設隱藏 */
+            position: fixed;
+            z-index: 0;
+            left: 10;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* 背景半透明 */
+        }
 
-    .background-modal-content {
-        background-color: #fefefe;
-        margin: 10% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        max-width: 400px;
-        text-align: center;
-    }
+        .music-modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
 
-    .background-modal-content .close {
-        color: #aaa;
-        float: right;
-        font-size: 24px;
-        font-weight: bold;
-        cursor: pointer;
-    }
+        }
 
-    .background-modal-content .close:hover {
-        color: #000;
-    }
+        .music-modal-content .close {
+            color: #aaa;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-    .background-list {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .background-option {
-        width: 100px;
-        height: 100px;
-        cursor: pointer;
-        border: 2px solid transparent;
-        transition: transform 0.2s;
-    }
-
-    .background-option:hover {
-        transform: scale(1.1);
-        border-color: #28a745;
-    }
-    
-    #backgroundSelectBtn {
-    position: absolute; /* 絕對定位 */
-    bottom: 23%; /* 距離畫布底部20px */
-    left: 56.5%; /* 距離畫布右側20px */
-    z-index: 10; /* 確保按鈕在畫布之上 */
-}
+        .music-modal-content .close:hover {
+            color: #000;
+        }
 
 
-/* 排行榜按鈕位置 */
-#leaderboardBtn {
-    position: absolute;
-    top:5.5%; /* 調整按鈕相對於標題的垂直距離 */
-    right: 42%;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-}
+        #musicList {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* 水平置中 */
+            gap: 10px;
+            /* 選項之間的間距 */
+        }
 
-/* 排行榜彈出視窗樣式 */
-.leaderboard-modal {
-    display: none; /* 初始隱藏 */
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
-}
+        #musicList li {
+            cursor: pointer;
+            padding: 10px;
+            /* 上下內距 */
+            padding-right: 50px;
+            list-style: none;
+            text-align: center;
+            width: 100%;
+            border-bottom: 1px solid #ddd;
+        }
 
-.leaderboard-modal-content {
-    background-color: #fff;
-    margin: 10% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 400px;
-    text-align: center;
-}
+        #musicList li:hover {
+            background-color: #f0f0f0;
+        }
 
-.leaderboard-modal-content .close {
-    color: #aaa;
-    float: right;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-}
 
-.leaderboard-modal-content .close:hover {
-    color: #000;
-}
 
-#leaderboardModal .modal-content {
-    padding: 30px; /* 增加內距，讓背景變大 */
-    margin: 20px auto; /* 控制外距 */
-    max-width: 90vw; /* 限制寬度，不超出視窗 */
-    max-height: 80vh; /* 限制高度，不超出視窗 */
-    overflow-y: auto; /* 垂直滾動條 */
-    overflow-x: auto; /* 水平滾動條 */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影增加層次感 */
-    border-radius: 10px; /* 圓角樣式 */
-    background-color: #fff; /* 背景顏色 */
-}
 
-/* 排行榜內容樣式 */
-.leaderboard-modal-content {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%; /* 設定彈出視窗的寬度，例如 80% 的螢幕寬度 */
-    max-width: 600px; /* 設定最大寬度，防止彈出視窗過大 */
-    max-height: 90%; /* 設定最大高度，防止彈出視窗過高 */
-    overflow-y: auto; /* 當內容過多時允許垂直滾動 */
+        #musicSelectBtn {
+            position: absolute;
+            top: 695px;
+            right: calc(45% + 150px);
+            /* 調整 right 位置，使其與開始遊戲按鈕靠近 */
+            transform: translateX(-50%);
+            z-index: 10;
+        }
 
-}
-/* 清除排行榜按鈕樣式 */
-.btn-clear {
-    background-color: #d9534f;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin-top: 5px;
-    border-radius: 10px;
-    font-size: 20px;
-    margin-right: 20px; /* 調整按鈕向左偏移 */
 
-    
-    
-}
+        /* 彈出式背景選擇容器樣式 */
+        .background-modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
 
-.btn-clear:hover {
-    background-color: #c9302c;
-}
+        .background-modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
 
-#uploadBrickThemeBtn {
-    position: absolute;
-    top: 12%;   /* 距離畫布頂部 */
-    right:40%;  /* 距離畫布右側 */
-    z-index: 15;
-}
-/* 重置按鈕樣式與位置 */
-#resetBrickThemeBtn {
-    position: absolute;
-    top: 20%;     /* 調整至畫布適當位置 */
-    right: 40%;    /* 距離畫布右側 */
-    z-index: 10;
-}
+        .background-modal-content .close {
+            color: #aaa;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-#uploadBrickThemeBtn, #resetBrickThemeBtn {
-    width: 60px; /* 調整寬度和高度使按鈕為圓形 */
-    height: 60px;
-    border-radius: 50%; /* 設置圓形 */
-    font-size: 14px; /* 字體大小 */
-    text-align: center; /* 文字居中 */
-    display: flex; /* 讓文字居中 */
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    border: none;
-    color: white; /* 設置文字顏色 */
-    background-color: #6c757d; /* 按鈕背景色 */
-    cursor: pointer;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* 添加陰影效果 */
-    transition: background-color 0.3s, box-shadow 0.3s; /* 添加過渡效果 */
-}
+        .background-modal-content .close:hover {
+            color: #000;
+        }
 
-#uploadBrickThemeBtn:hover, #resetBrickThemeBtn:hover {
-    background-color: #5a6268; /* 滑鼠懸停時的背景顏色 */
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4); /* 滑鼠懸停時的陰影 */
-}
+        .background-list {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
 
+        .background-option {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .background-option:hover {
+            transform: scale(1.1);
+            border-color: #28a745;
+        }
+
+        #backgroundSelectBtn {
+            position: absolute;
+            /* 絕對定位 */
+            bottom: 23%;
+            /* 距離畫布底部20px */
+            left: 56.5%;
+            /* 距離畫布右側20px */
+            z-index: 10;
+            /* 確保按鈕在畫布之上 */
+        }
+
+
+        /* 排行榜按鈕位置 */
+        #leaderboardBtn {
+            position: absolute;
+            top: 5.5%;
+            /* 調整按鈕相對於標題的垂直距離 */
+            right: 42%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        /* 排行榜彈出視窗樣式 */
+        .leaderboard-modal {
+            display: none;
+            /* 初始隱藏 */
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* 半透明背景 */
+        }
+
+        .leaderboard-modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .leaderboard-modal-content .close {
+            color: #aaa;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .leaderboard-modal-content .close:hover {
+            color: #000;
+        }
+
+        #leaderboardModal .modal-content {
+            padding: 30px;
+            /* 增加內距，讓背景變大 */
+            margin: 20px auto;
+            /* 控制外距 */
+            max-width: 90vw;
+            /* 限制寬度，不超出視窗 */
+            max-height: 80vh;
+            /* 限制高度，不超出視窗 */
+            overflow-y: auto;
+            /* 垂直滾動條 */
+            overflow-x: auto;
+            /* 水平滾動條 */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            /* 添加陰影增加層次感 */
+            border-radius: 10px;
+            /* 圓角樣式 */
+            background-color: #fff;
+            /* 背景顏色 */
+        }
+
+        /* 排行榜內容樣式 */
+        .leaderboard-modal-content {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            /* 設定彈出視窗的寬度，例如 80% 的螢幕寬度 */
+            max-width: 600px;
+            /* 設定最大寬度，防止彈出視窗過大 */
+            max-height: 90%;
+            /* 設定最大高度，防止彈出視窗過高 */
+            overflow-y: auto;
+            /* 當內容過多時允許垂直滾動 */
+
+        }
+
+        /* 清除排行榜按鈕樣式 */
+        .btn-clear {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 5px;
+            border-radius: 10px;
+            font-size: 20px;
+            margin-right: 20px;
+            /* 調整按鈕向左偏移 */
+
+
+
+        }
+
+        .btn-clear:hover {
+            background-color: #c9302c;
+        }
+
+        #uploadBrickThemeBtn {
+            position: absolute;
+            top: 12%;
+            /* 距離畫布頂部 */
+            right: 40%;
+            /* 距離畫布右側 */
+            z-index: 15;
+        }
+
+        /* 重置按鈕樣式與位置 */
+        #resetBrickThemeBtn {
+            position: absolute;
+            top: 20%;
+            /* 調整至畫布適當位置 */
+            right: 40%;
+            /* 距離畫布右側 */
+            z-index: 10;
+        }
+
+        #uploadBrickThemeBtn,
+        #resetBrickThemeBtn {
+            width: 60px;
+            /* 調整寬度和高度使按鈕為圓形 */
+            height: 60px;
+            border-radius: 50%;
+            /* 設置圓形 */
+            font-size: 14px;
+            /* 字體大小 */
+            text-align: center;
+            /* 文字居中 */
+            display: flex;
+            /* 讓文字居中 */
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            border: none;
+            color: white;
+            /* 設置文字顏色 */
+            background-color: #6c757d;
+            /* 按鈕背景色 */
+            cursor: pointer;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            /* 添加陰影效果 */
+            transition: background-color 0.3s, box-shadow 0.3s;
+            /* 添加過渡效果 */
+        }
+
+        #uploadBrickThemeBtn:hover,
+        #resetBrickThemeBtn:hover {
+            background-color: #5a6268;
+            /* 滑鼠懸停時的背景顏色 */
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+            /* 滑鼠懸停時的陰影 */
+        }
+
+        body,
+        canvas,
+        #uploadBrickThemeBtn,
+        #backgroundSelectBtn {
+            user-select: none;
+        }
     </style>
 
 </head>
+
 <body>
 
- 
-    
+
+
     <div class="container text-center">
         <!-- 遊戲標題 -->
         <h1 class="mt-5">打磚塊遊戲</h1>
@@ -375,9 +470,9 @@
                 </table>
             </div>
         </div>
-        
 
-        <div id="backgroundImages class="text-center my-3">
+
+        <div id="backgroundImages" class="text-center my-3">
             <img src="background/夜空縮略圖.png" id="nightThumbnail" class="background-thumbnail" alt="夜空" />
             <img src="background/森林縮略圖.png" id="forestThumbnail" class="background-thumbnail" alt="森林" />
         </div>
@@ -400,18 +495,18 @@
 
         <audio id="backgroundMusic" loop></audio>
         <audio id="hitSound" src="music/擊打音效.mp3"></audio>
-        
 
 
-        
+
+
         <!-- 遊戲畫布 -->
         <canvas id="gameCanvas" width="480" height="320"></canvas>
     </div>
 
-    
-     <!-- 開始遊戲按鈕 -->
-     <button id="startBtn" class="btn btn-primary btn-lg">開始遊戲</button>
-     <img id="musicControlBtn" src="image/播放狀態.jpg" alt="播放音樂" onclick="toggleMusic()" />
+
+    <!-- 開始遊戲按鈕 -->
+    <button id="startBtn" class="btn btn-primary btn-lg">開始遊戲</button>
+    <img id="musicControlBtn" src="image/播放狀態.jpg" alt="播放音樂" onclick="toggleMusic()" />
 
     <!-- 磚塊主題選擇按鈕 -->
     <button id="uploadBrickThemeBtn" class="btn btn-secondary">自己換磚塊主題</button>
@@ -424,81 +519,90 @@
     <!-- 自定義遊戲程式碼 -->
 
     <!-- 音樂選擇按鈕 -->
-<button id="musicSelectBtn" class="btn btn-secondary">選擇音樂</button>
+    <button id="musicSelectBtn" class="btn btn-secondary">選擇音樂</button>
 
-<!-- 音樂清單的彈出式容器 -->
-<div id="musicListModal" class="music-modal">
-    <div class="music-modal-content">
-        <span class="close">&times;</span>
-        <h2>選擇背景音樂</h2>
-        <ul id="musicList">
-            <li data-music="music/小點子.mp3">小點子</li>
-            <li data-music="music/GODS.mp3">GODS</li>
-            <li data-music="music/Legends Never Die.mp3">Legends Never Die</li>
-        </ul>
-    </div>
-</div>
+    <!-- 音樂清單的彈出式容器 -->
+    <div id="musicListModal" class="music-modal">
+        <div class="music-modal-content">
+            <span class="close">&times;</span>
+            <h2>選擇背景音樂</h2>
+            <ul id="musicList">
+                <li data-music="music/小點子.mp3">小點子</li>
+                <li data-music="music/GODS.mp3">GODS</li>
+                <li data-music="music/Legends Never Die.mp3">Legends Never Die</li>
+                <li data-music="music/RISE.mp3">RISE</li>
+                <li data-music="music/Silver Scrapes.mp3">Sliver Scrapes</li>
 
-<!-- 新增選擇背景的按鈕 -->
-<button id="backgroundSelectBtn" class="btn btn-secondary">選擇網頁背景</button>
-
-<!-- 背景清單的彈出式容器 -->
-<div id="backgroundListModal" class="background-modal">
-    <div class="background-modal-content">
-        <span class="close">&times;</span>
-        <h2>選擇背景</h2>
-        <div id="backgroundList" class="background-list">
-            <img src="htmlbackground/夕陽.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/夕陽.jpg">
-            <img src="htmlbackground/天空.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/天空.jpg">
-            <img src="htmlbackground/月亮.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/月亮.jpg">
-            <img src="htmlbackground/雪地.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/雪地.jpg">
-            <img src="htmlbackground/雲海.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/雲海.jpg">
-            <img src="htmlbackground/櫻花.jpg" alt="夕陽" class="background-option" data-background="htmlbackground/櫻花.jpg">
-
-
-            <!-- 可以添加更多圖片選項 -->
+            </ul>
         </div>
     </div>
-</div>
-<!-- Modal (彈出視窗) -->
-<div id="gameDescriptionModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span> <!-- 關閉按鈕 -->
-        <h2>打磚塊遊戲說明</h2>
-        <p>
-            歡迎來到打磚塊遊戲！這是一款經典的街機遊戲，考驗你的反應速度和精準度。以下是遊戲的詳細說明和操作指南：
-            <br><br>
-            <strong>遊戲目標：</strong><br>
-            在遊戲中，你需要控制底部的擋板，反彈小球並擊碎上方的所有磚塊。當所有磚塊被擊碎時，你將過關並進入下一個更具挑戰性的關卡。如果小球掉到底部，你會失去一條生命，當生命全部用完時，遊戲結束。
-            <br><br>
-            <strong>遊戲規則：</strong><br>
-            1. 每次反彈小球擊中磚塊時，得1分，部分磚塊可能需要多次擊打才能完全破壞。<br>
-            2. 每當你獲得三分，可能會觸發特別獎勵，如延長時間或增加生命。<br>
-            3. 遊戲分為三個不同的難度等級（簡單、中等、困難），每個難度有三個關卡。<br>
-            4. 成功通過所有關卡後，總分數將顯示，並且你可以重新挑戰。
-            <br><br>
-            <strong>操作方法：</strong><br>
-            - 使用左箭頭和右箭頭控制擋板左右移動，或使用滑鼠移動來精確控制擋板位置。<br>
-            - 左鍵點擊：擋板跳躍。<br>
-            <br><br>
-            <strong>特別功能：</strong><br>
-            - <strong>時間限制：</strong> 每一關卡有固定的時間限制，當時間耗盡時遊戲結束。<br>
-            - <strong>連擊加分：</strong> 連擊數，一次以下多得一分。兩次以上多得三分，提升你的最終得分。
-            <br><br>
-            <strong>挑戰自己：</strong><br>
-            來挑戰不同的難度並打破你的最高得分吧！
-            <br><br>
-            祝你好運，玩得開心！
-        </p>
-    </div>
-</div>
 
-    
+    <!-- 新增選擇背景的按鈕 -->
+    <button id="backgroundSelectBtn" class="btn btn-secondary">選擇網頁背景</button>
+
+    <!-- 背景清單的彈出式容器 -->
+    <div id="backgroundListModal" class="background-modal">
+        <div class="background-modal-content">
+            <span class="close">&times;</span>
+            <h2>選擇背景</h2>
+            <div id="backgroundList" class="background-list">
+                <img src="htmlbackground/夕陽.jpg" alt="夕陽" class="background-option"
+                    data-background="htmlbackground/夕陽.jpg">
+                <img src="htmlbackground/天空.jpg" alt="夕陽" class="background-option"
+                    data-background="htmlbackground/天空.jpg">
+                <img src="htmlbackground/月亮.jpg" alt="夕陽" class="background-option"
+                    data-background="htmlbackground/月亮.jpg">
+                <img src="htmlbackground/雪地.jpg" alt="夕陽" class="background-option"
+                    data-background="htmlbackground/雪地.jpg">
+                <img src="htmlbackground/雲海.jpg" alt="夕陽" class="background-option"
+                    data-background="htmlbackground/雲海.jpg">
+                <img src="htmlbackground/櫻花.jpg" alt="夕陽" class="background-option"
+                    data-background="htmlbackground/櫻花.jpg">
+
+
+                <!-- 可以添加更多圖片選項 -->
+            </div>
+        </div>
+    </div>
+    <!-- Modal (彈出視窗) -->
+    <div id="gameDescriptionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span> <!-- 關閉按鈕 -->
+            <h2>打磚塊遊戲說明</h2>
+            <p>
+                歡迎來到打磚塊遊戲！這是一款經典的街機遊戲，考驗你的反應速度和精準度。以下是遊戲的詳細說明和操作指南：
+                <br><br>
+                <strong>遊戲目標：</strong><br>
+                在遊戲中，你需要控制底部的擋板，反彈小球並擊碎上方的所有磚塊。當所有磚塊被擊碎時，你將過關並進入下一個更具挑戰性的關卡。如果小球掉到底部，你會失去一條生命，當生命全部用完時，遊戲結束。
+                <br><br>
+                <strong>遊戲規則：</strong><br>
+                1. 每次反彈小球擊中磚塊時，得1分，部分磚塊可能需要多次擊打才能完全破壞。<br>
+                2. 每當你獲得三分，可能會觸發特別獎勵，如延長時間或增加生命。<br>
+                3. 遊戲分為三個不同的難度等級（簡單、中等、困難），每個難度有三個關卡。<br>
+                4. 成功通過所有關卡後，總分數將顯示，並且你可以重新挑戰。
+                <br><br>
+                <strong>操作方法：</strong><br>
+                - 使用左箭頭和右箭頭控制擋板左右移動，或使用滑鼠移動來精確控制擋板位置。<br>
+                - 左鍵點擊：擋板跳躍。<br>
+                <br><br>
+                <strong>特別功能：</strong><br>
+                - <strong>時間限制：</strong> 每一關卡有固定的時間限制，當時間耗盡時遊戲結束。<br>
+                - <strong>連擊加分：</strong> 連擊數，一次以下多得一分。兩次以上多得三分，提升你的最終得分。
+                <br><br>
+                <strong>挑戰自己：</strong><br>
+                來挑戰不同的難度並打破你的最高得分吧！
+                <br><br>
+                祝你好運，玩得開心！
+            </p>
+        </div>
+    </div>
+
+
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        let ballRadius =10;
+        let ballRadius = 10;
         let x = canvas.width / 2;
         let y = canvas.height - 30;
         let dx = 3;  // 新的初始水平速度
@@ -540,7 +644,7 @@
         let paddleY = canvas.height - paddleHeight;  // 讓擋板能夠上下移動
         const reward = Math.random() < 0.5 ? 'time' : 'life';
         // 新增三個不同排列的關卡資料
-                
+
         let difficulty = null;  // 初始化難度為null，確保沒有預設值
         let selectedLevelIndex = null;  // 初始化關卡索引為null
         let initialDx = 2;  // 初始水平速度
@@ -576,7 +680,7 @@
         const brickThemeInput = document.getElementById("brickThemeInput");
         let brickThemeImage = null; // 用於存儲磚塊主題圖片
 
-const resetBrickThemeBtn = document.getElementById('resetBrickThemeBtn'); // 假設新增了預設主題按鈕
+        const resetBrickThemeBtn = document.getElementById('resetBrickThemeBtn'); // 假設新增了預設主題按鈕
         // 點擊按鈕時打開文件選擇器
         uploadBrickThemeBtn.addEventListener("click", () => {
             brickThemeInput.click();
@@ -601,37 +705,37 @@ const resetBrickThemeBtn = document.getElementById('resetBrickThemeBtn'); // 假
 
 
         document.getElementById("brickThemeInput").addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const uploadedImage = new Image();
-            uploadedImage.src = e.target.result;
-            brickThemeImage = uploadedImage;
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const uploadedImage = new Image();
+                    uploadedImage.src = e.target.result;
+                    brickThemeImage = uploadedImage;
 
-            // 保存圖片數據到 localStorage
-            localStorage.setItem("brickThemeImage", e.target.result);
-        };
-        reader.readAsDataURL(file);
-    }
-});
+                    // 保存圖片數據到 localStorage
+                    localStorage.setItem("brickThemeImage", e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
 
-    document.getElementById("resetBrickThemeBtn").addEventListener("click", () => {
-        localStorage.removeItem("brickThemeImage"); // 清除 localStorage 中的圖片數據
-        brickThemeImage = null; // 重置圖片變量
-    });
+        document.getElementById("resetBrickThemeBtn").addEventListener("click", () => {
+            localStorage.removeItem("brickThemeImage"); // 清除 localStorage 中的圖片數據
+            brickThemeImage = null; // 重置圖片變量
+        });
 
 
         // 頁面加載時檢查 localStorage
-    document.addEventListener("DOMContentLoaded", () => {
-        const savedTheme = localStorage.getItem("brickThemeImage");
-        if (savedTheme) {
-            const savedImage = new Image();
-            savedImage.src = savedTheme;
-            brickThemeImage = savedImage; // 加載保存的主題圖片
-        }
-    });
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem("brickThemeImage");
+            if (savedTheme) {
+                const savedImage = new Image();
+                savedImage.src = savedTheme;
+                brickThemeImage = savedImage; // 加載保存的主題圖片
+            }
+        });
 
         // 點擊排行榜按鈕顯示排行榜
         leaderboardBtn.addEventListener("click", () => {
@@ -650,34 +754,34 @@ const resetBrickThemeBtn = document.getElementById('resetBrickThemeBtn'); // 假
                 leaderboardModal.style.display = "none";
             }
         });
-                
-        window.addEventListener("click", (event) => {
-    if (event.target === musicListModal) {
-        musicListModal.style.display = "none";
-    }
-});
 
-                
-        
-        
+        window.addEventListener("click", (event) => {
+            if (event.target === musicListModal) {
+                musicListModal.style.display = "none";
+            }
+        });
+
+
+
+
         // 頁面載入時自動設定預設背景圖片
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             document.body.style.backgroundImage = "url('htmlbackground/月亮.jpg')";
             document.body.style.backgroundSize = "cover"; // 設置背景大小
         });
 
         // 點擊按鈕開啟 Modal
-        btn.onclick = function() {
+        btn.onclick = function () {
             modal.style.display = "block";
         }
 
         // 點擊 X 關閉 Modal
-        closeModal.addEventListener("click", function() {
-    modal.style.display = "none"; // 隱藏彈窗
-});
+        closeModal.addEventListener("click", function () {
+            modal.style.display = "none"; // 隱藏彈窗
+        });
 
         // 點擊 Modal 外部區域關閉
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target == modal) {
                 modal.style.display = "none";
             }
@@ -717,832 +821,832 @@ const resetBrickThemeBtn = document.getElementById('resetBrickThemeBtn'); // 假
         ];
 
         const mediumLevels = [
-    {
-        name: 'Level 1',
-        brickRowCount: 4,
-        brickColumnCount: 6,
-        brickArrangement: [
-            [1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1],
-            [1, 0, 1, 0, 1, 0],  // 0 代表消失的磚塊
-            [1, 1, 1, 1, 1, 1]
-        ]
-    },
-    {
-        name: 'Level 2',
-        brickRowCount: 4,
-        brickColumnCount: 6,
-        brickArrangement: [
-            [1, 0, 2, 0, 1, 0],  // 邊緣消失，並且有些磚塊需要兩次擊打
-            [2, 2, 0, 2, 2, 2],  // 中間部分消失的磚塊
-            [0, 1, 0, 1, 2, 0],  // 部分需要兩次擊打
-            [1, 0, 1, 0, 1, 0]   // 邊緣少量磚塊
-        ]
-    },
-    {
-        name: 'Level 3',
-        brickRowCount: 4,
-        brickColumnCount: 6,
-        brickArrangement: [
-            [2, 0, 2, 0, 2, 2],  // 部分磚塊消失
-            [3, 0, 3, 0, 3, 0],  // 需要三次擊打的磚塊與空白區域交替排列
-            [1, 0, 2, 0, 1, 0],  // 有消失的區域
-            [0, 1, 0, 1, 0, 1]   // 邊緣少量磚塊
-        ]
-    }
-];
+            {
+                name: 'Level 1',
+                brickRowCount: 4,
+                brickColumnCount: 6,
+                brickArrangement: [
+                    [1, 1, 1, 1, 1, 1],
+                    [1, 1, 1, 1, 1, 1],
+                    [1, 0, 1, 0, 1, 0],  // 0 代表消失的磚塊
+                    [1, 1, 1, 1, 1, 1]
+                ]
+            },
+            {
+                name: 'Level 2',
+                brickRowCount: 4,
+                brickColumnCount: 6,
+                brickArrangement: [
+                    [1, 0, 2, 0, 1, 0],  // 邊緣消失，並且有些磚塊需要兩次擊打
+                    [2, 2, 0, 2, 2, 2],  // 中間部分消失的磚塊
+                    [0, 1, 0, 1, 2, 0],  // 部分需要兩次擊打
+                    [1, 0, 1, 0, 1, 0]   // 邊緣少量磚塊
+                ]
+            },
+            {
+                name: 'Level 3',
+                brickRowCount: 4,
+                brickColumnCount: 6,
+                brickArrangement: [
+                    [2, 0, 2, 0, 2, 2],  // 部分磚塊消失
+                    [3, 0, 3, 0, 3, 0],  // 需要三次擊打的磚塊與空白區域交替排列
+                    [1, 0, 2, 0, 1, 0],  // 有消失的區域
+                    [0, 1, 0, 1, 0, 1]   // 邊緣少量磚塊
+                ]
+            }
+        ];
 
 
-const hardLevels = [
-    {
-        name: 'Level 1',
-        brickRowCount: 5,
-        brickColumnCount: 7,
-        brickArrangement: [
-            [2, 1, 2, 1, 2, 1, 2],
-            [1, 2, 1, 2, 1, 2, 1],
-            [1, 1, 1, 1, 1, 1, 1],
-            [2, 0, 2, 0, 2, 0, 2],  // 0 代表消失的磚塊
-            [1, 2, 1, 2, 1, 2, 1]
-        ]
-    },
-    {
-        name: 'Level 2',
-        brickRowCount: 5,
-        brickColumnCount: 7,
-        brickArrangement: [
-            [2, 2, 3, 0, 3, 2, 2],  // 部分消失並需要三次擊打
-            [0, 3, 0, 2, 3, 2, 0],  // 左右兩側有消失的磚塊
-            [2, 0, 1, 2, 1, 0, 2],  // 消失磚塊與一般磚塊混合
-            [3, 0, 2, 2, 0, 3, 3],  // 中間部分更具挑戰性
-            [1, 0, 0, 0, 0, 1, 1]   // 底部消失的區域
-        ]
-    },
-    {
-        name: 'Level 3',
-        brickRowCount: 5,
-        brickColumnCount: 7,
-        brickArrangement: [
-            [3, 0, 3, 2, 0, 3, 2],  // 中間部分消失並且需要多次擊打
-            [2, 1, 0, 0, 1, 0, 2],  // 部分磚塊消失
-            [3, 3, 0, 3, 0, 3, 3],  // 需要三次擊打的磚塊較多
-            [2, 0, 2, 0, 2, 0, 2],  // 消失磚塊交錯排列
-            [0, 1, 1, 1, 0, 1, 0]   // 邊緣磚塊消失
-        ]
-    }
-];
+        const hardLevels = [
+            {
+                name: 'Level 1',
+                brickRowCount: 5,
+                brickColumnCount: 7,
+                brickArrangement: [
+                    [2, 1, 2, 1, 2, 1, 2],
+                    [1, 2, 1, 2, 1, 2, 1],
+                    [1, 1, 1, 1, 1, 1, 1],
+                    [2, 0, 2, 0, 2, 0, 2],  // 0 代表消失的磚塊
+                    [1, 2, 1, 2, 1, 2, 1]
+                ]
+            },
+            {
+                name: 'Level 2',
+                brickRowCount: 5,
+                brickColumnCount: 7,
+                brickArrangement: [
+                    [2, 2, 3, 0, 3, 2, 2],  // 部分消失並需要三次擊打
+                    [0, 3, 0, 2, 3, 2, 0],  // 左右兩側有消失的磚塊
+                    [2, 0, 1, 2, 1, 0, 2],  // 消失磚塊與一般磚塊混合
+                    [3, 0, 2, 2, 0, 3, 3],  // 中間部分更具挑戰性
+                    [1, 0, 0, 0, 0, 1, 1]   // 底部消失的區域
+                ]
+            },
+            {
+                name: 'Level 3',
+                brickRowCount: 5,
+                brickColumnCount: 7,
+                brickArrangement: [
+                    [3, 0, 3, 2, 0, 3, 2],  // 中間部分消失並且需要多次擊打
+                    [2, 1, 0, 0, 1, 0, 2],  // 部分磚塊消失
+                    [3, 3, 0, 3, 0, 3, 3],  // 需要三次擊打的磚塊較多
+                    [2, 0, 2, 0, 2, 0, 2],  // 消失磚塊交錯排列
+                    [0, 1, 1, 1, 0, 1, 0]   // 邊緣磚塊消失
+                ]
+            }
+        ];
 
-// 清除排行榜按鈕事件
-// 清除排行榜按鈕事件
-document.getElementById('clearLeaderboardBtn').addEventListener('click', () => {
-    Swal.fire({
-        title: '確定清除排行榜？',
-        text: '此操作將會刪除所有的排行榜記錄，無法復原。',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '確定',
-        cancelButtonText: '取消'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // 確認 localStorage 中的鍵名是否一致
-            localStorage.removeItem('leaderboard');
+        // 清除排行榜按鈕事件
+        // 清除排行榜按鈕事件
+        document.getElementById('clearLeaderboardBtn').addEventListener('click', () => {
+            Swal.fire({
+                title: '確定清除排行榜？',
+                text: '此操作將會刪除所有的排行榜記錄，無法復原。',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '確定',
+                cancelButtonText: '取消'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 確認 localStorage 中的鍵名是否一致
+                    localStorage.removeItem('leaderboard');
 
-            // 清空表格內容
-            const leaderboardBody = document.getElementById('leaderboard').querySelector("tbody");
-            leaderboardBody.innerHTML = '';
+                    // 清空表格內容
+                    const leaderboardBody = document.getElementById('leaderboard').querySelector("tbody");
+                    leaderboardBody.innerHTML = '';
 
-            // 顯示成功訊息
-            Swal.fire('已清除!', '排行榜已經被清空。', 'success');
+                    // 顯示成功訊息
+                    Swal.fire('已清除!', '排行榜已經被清空。', 'success');
+                }
+            });
+        });
+
+
+
+        // 當玩家點擊「選擇背景」按鈕時，顯示背景選擇選單
+        backgroundSelectBtn.addEventListener("click", () => {
+            backgroundListModal.style.display = "block";
+        });
+
+        // 點擊每個背景選項更改畫布外背景
+        backgroundOptions.forEach(option => {
+            option.addEventListener("click", () => {
+                const selectedBackground = option.getAttribute("data-background");
+
+                // 將選取的背景圖應用至畫布的外部背景
+                document.body.style.backgroundImage = `url(${selectedBackground})`;
+                document.body.style.backgroundSize = "cover"; // 調整背景圖案大小
+
+                // 關閉背景選單
+                backgroundListModal.style.display = "none";
+            });
+        });
+
+        // 點擊 X 按鈕或背景模態框外部區域關閉選單
+        closeBackgroundModal.addEventListener("click", () => {
+            backgroundListModal.style.display = "none";
+        });
+
+        window.addEventListener("click", (event) => {
+            if (event.target === backgroundListModal) {
+                backgroundListModal.style.display = "none";
+            }
+        });
+
+        // 選擇背景的事件邏輯
+        document.getElementById("nightThumbnail").addEventListener("click", function () {
+            currentBackground.src = backgroundImages.night;
+            highlightSelectedThumbnail("nightThumbnail");
+            checkIfReadyToStart();  // 檢查是否已準備好開始遊戲
+        });
+
+        document.getElementById("forestThumbnail").addEventListener("click", function () {
+            currentBackground.src = backgroundImages.forest;
+            highlightSelectedThumbnail("forestThumbnail");
+            checkIfReadyToStart();  // 檢查是否已準備好開始遊戲
+        });
+
+        function highlightSelectedThumbnail(selectedThumbnailId) {
+            document.getElementById("nightThumbnail").classList.remove("active");
+            document.getElementById("forestThumbnail").classList.remove("active");
+            document.getElementById(selectedThumbnailId).classList.add("active");
         }
-    });
-});
 
 
+        // 音樂彈窗的打開與關閉事件
+        musicSelectBtn.addEventListener("click", () => {
+            musicListModal.style.display = "block";
+        });
 
-// 當玩家點擊「選擇背景」按鈕時，顯示背景選擇選單
-backgroundSelectBtn.addEventListener("click", () => {
-    backgroundListModal.style.display = "block";
-});
+        // 音樂清單彈窗的關閉按鈕
+        const musicModalCloseBtn = document.querySelector("#musicListModal .close");
+        musicModalCloseBtn.addEventListener("click", () => {
+            musicListModal.style.display = "none";
+        });
 
-// 點擊每個背景選項更改畫布外背景
-backgroundOptions.forEach(option => {
-    option.addEventListener("click", () => {
-        const selectedBackground = option.getAttribute("data-background");
+        // 點擊彈窗外部關閉音樂清單彈窗
+        window.addEventListener("click", (event) => {
+            if (event.target === musicListModal) {
+                musicListModal.style.display = "none";
+            }
+        });
 
-        // 將選取的背景圖應用至畫布的外部背景
-        document.body.style.backgroundImage = `url(${selectedBackground})`;
-        document.body.style.backgroundSize = "cover"; // 調整背景圖案大小
-
-        // 關閉背景選單
-        backgroundListModal.style.display = "none";
-    });
-});
-
-// 點擊 X 按鈕或背景模態框外部區域關閉選單
-closeBackgroundModal.addEventListener("click", () => {
-    backgroundListModal.style.display = "none";
-});
-
-window.addEventListener("click", (event) => {
-    if (event.target === backgroundListModal) {
-        backgroundListModal.style.display = "none";
-    }
-});
-
-// 選擇背景的事件邏輯
-document.getElementById("nightThumbnail").addEventListener("click", function() {
-    currentBackground.src = backgroundImages.night;
-    highlightSelectedThumbnail("nightThumbnail");
-    checkIfReadyToStart();  // 檢查是否已準備好開始遊戲
-});
-
-document.getElementById("forestThumbnail").addEventListener("click", function() {
-    currentBackground.src = backgroundImages.forest;
-    highlightSelectedThumbnail("forestThumbnail");
-    checkIfReadyToStart();  // 檢查是否已準備好開始遊戲
-});
-
-function highlightSelectedThumbnail(selectedThumbnailId) {
-    document.getElementById("nightThumbnail").classList.remove("active");
-    document.getElementById("forestThumbnail").classList.remove("active");
-    document.getElementById(selectedThumbnailId).classList.add("active");
-}
-
-
-// 音樂彈窗的打開與關閉事件
-musicSelectBtn.addEventListener("click", () => {
-    musicListModal.style.display = "block";
-});
-
-// 音樂清單彈窗的關閉按鈕
-const musicModalCloseBtn = document.querySelector("#musicListModal .close");
-musicModalCloseBtn.addEventListener("click", () => {
-    musicListModal.style.display = "none";
-});
-
-// 點擊彈窗外部關閉音樂清單彈窗
-window.addEventListener("click", (event) => {
-    if (event.target === musicListModal) {
-        musicListModal.style.display = "none";
-    }
-});
-
-
-// 關閉音樂清單
-closeModal.addEventListener("click", () => {
-    musicListModal.style.display = "none";
-});
-
-musicList.addEventListener("click", (event) => {
-    if (event.target.tagName === "LI") {
-        const musicFile = event.target.getAttribute("data-music");
-
-        // 停止當前播放的音樂並播放新的音樂
-        backgroundMusic.pause();
-        backgroundMusic.src = musicFile;
-        backgroundMusic.play();
-
-        // 更新控制按鈕為播放狀態的圖標
-        musicControlBtn.src = "image/播放狀態.jpg";
-        isMusicPlaying = true;
 
         // 關閉音樂清單
-        musicListModal.style.display = "none";
-    }
-});
-
-
-// 點擊模態框外部時關閉
-window.addEventListener("click", (event) => {
-    if (event.target === musicListModal) {
-        musicListModal.style.display = "none";
-    }
-});
-
-// 檢查是否已選擇難度和背景來啟用關卡選擇按鈕
-function checkIfReadyToStart() {
-    if (difficulty && currentBackground.src) {
-        document.getElementById("levelButtons").style.display = "block";  // 顯示 Level 按鈕
-    }
-}
-
-// 選擇難度按鈕事件
-document.getElementById("easyBtn").addEventListener("click", function() {
-    difficulty = "easy";
-    highlightSelectedDifficulty("easyBtn");
-    checkIfReadyToStart();  // 檢查是否已準備好開始遊戲
-});
-document.getElementById("mediumBtn").addEventListener("click", function() {
-    difficulty = "medium";
-    highlightSelectedDifficulty("mediumBtn");
-    checkIfReadyToStart();  // 檢查是否已準備好開始遊戲
-});
-document.getElementById("hardBtn").addEventListener("click", function() {
-    difficulty = "hard";
-    highlightSelectedDifficulty("hardBtn");
-    checkIfReadyToStart();  // 檢查是否已準備好開始遊戲
-});
-
-function highlightSelectedDifficulty(selectedBtnId) {
-    document.getElementById("easyBtn").classList.remove("active");
-    document.getElementById("mediumBtn").classList.remove("active");
-    document.getElementById("hardBtn").classList.remove("active");
-    document.getElementById(selectedBtnId).classList.add("active");
-}
-
-// 點擊按鈕開始遊戲
-// 點擊按鈕開始遊戲
-const startBtn = document.getElementById("startBtn");
-const hideElementsCheckbox = document.getElementById("hideElementsCheckbox");
-
-
-// 選擇要隱藏的元素（可以是按鈕或其他控件）
-const elementsToHide = [
-    document.getElementById("difficultyButtons"),
-    document.getElementById("levelButtons"),
-    document.getElementById("musicSelectBtn"),
-    document.getElementById("backgroundSelectBtn")
-];
-
-// 點擊按鈕開始遊戲
-startBtn.addEventListener("click", function() {
-    // 檢查是否已選擇難度
-    if (!difficulty) {
-        Swal.fire({
-            icon: 'warning',
-            title: '選擇難度',
-            text: '請選擇難度！'
+        closeModal.addEventListener("click", () => {
+            musicListModal.style.display = "none";
         });
-        return;  // 停止遊戲開始
-    }
 
-    // 檢查是否已選擇Level
-    if (selectedLevelIndex === null) {
-        Swal.fire({
-            icon: 'warning',
-            title: '選擇關卡',
-            text: '請選擇Level！'
-        });
-        return;  // 停止遊戲開始
-    }
-    
-    startBtn.addEventListener("click", function() {
-    // 檢查是否勾選「隱藏按鈕」選項
-    if (hideElementsCheckbox.checked) {
-        elementsToHide.forEach(element => {
-            element.style.display = "none"; // 隱藏元素
-        });
-    }
+        musicList.addEventListener("click", (event) => {
+            if (event.target.tagName === "LI") {
+                const musicFile = event.target.getAttribute("data-music");
 
-    // 在這裡啟動遊戲的其他邏輯，例如開始遊戲
-    startGame();
-});
-    // 隱藏按鈕和選項
-    startBtn.style.display = "none";
-    document.getElementById("difficultyButtons").style.display = "none";
-    document.getElementById("levelButtons").style.display = "none";
+                // 停止當前播放的音樂並播放新的音樂
+                backgroundMusic.pause();
+                backgroundMusic.src = musicFile;
+                backgroundMusic.play();
 
-    // 根據選擇的難度和Level來啟動遊戲
-    let selectedLevel;
-    if (difficulty === "easy") {
-        selectedLevel = easyLevels[selectedLevelIndex];
-    } else if (difficulty === "medium") {
-        selectedLevel = mediumLevels[selectedLevelIndex];
-    } else if (difficulty === "hard") {
-        selectedLevel = hardLevels[selectedLevelIndex];
-    }
+                // 更新控制按鈕為播放狀態的圖標
+                musicControlBtn.src = "image/播放狀態.jpg";
+                isMusicPlaying = true;
 
-    startGame(selectedLevel.brickArrangement);  // 開始遊戲並傳入所選的關卡磚塊排列
-});
-
-
-
-
-
-const backgroundImages = {
-    night: "background/夜空.png",
-    forest: "background/森林.png"
-};
-
-
-
-let currentBackground = new Image();
-currentBackground.src = backgroundImages.night;  // 預設為夜空
-
-
-
-
-// 修改滑鼠事件進行擋板跳躍和回到原點
-canvas.addEventListener("mousedown", function(e) {
-    if (!canJump) return;  // 如果還在冷卻中，則不允許跳躍
-
-    if (e.button === 0) {  // 左鍵點擊，讓擋板跳躍
-        const originalPaddleY = paddleY;  // 記錄擋板的原始位置
-        paddleY = Math.max(paddleY - paddleJumpDistance, 0);  // 擋板向上移動，防止超出上邊界
-
-        // 使用定時器讓擋板在跳躍後返回原點
-        setTimeout(function() {
-            paddleY = originalPaddleY;  // 擋板回到初始位置
-        }, 300);  // 設定回到原點的延遲時間，單位為毫秒（例如 300ms）
-
-    } else if (e.button === 2) {  // 右鍵點擊，讓擋板向下移動
-        paddleY = Math.min(paddleY + paddleJumpDistance, canvas.height - paddleHeight);  // 防止超出下邊界
-    }
-
-    // 開啟冷卻時間以避免過於頻繁的跳躍
-    canJump = false;
-    setTimeout(function() {
-        canJump = true;  // 冷卻時間結束後允許跳躍
-    }, jumpCooldown);
-});
-
-// 禁止右鍵彈出功能表
-canvas.addEventListener("contextmenu", function(e) {
-    e.preventDefault();
-});
-
-// 處理跳躍時的球與擋板的碰撞
-function handleJumpCollision() {
-    // 在跳躍期間檢查球是否碰到擋板
-    if (y + ballRadius >= paddleY && y + ballRadius <= paddleY + paddleHeight &&
-        x > paddleX && x < paddleX + paddleWidth) {
-        dy = -dy;  // 擋板反彈
-    }
-}
-
-// 選擇關卡按鈕事件
-document.getElementById("level1Btn").addEventListener("click", function() {
-    selectedLevelIndex = 0;
-    highlightSelectedLevel("level1Btn");
-});
-document.getElementById("level2Btn").addEventListener("click", function() {
-    selectedLevelIndex = 1;
-    highlightSelectedLevel("level2Btn");
-});
-document.getElementById("level3Btn").addEventListener("click", function() {
-    selectedLevelIndex = 2;
-    highlightSelectedLevel("level3Btn");
-});
-
-function highlightSelectedLevel(selectedBtnId) {
-    document.getElementById("level1Btn").classList.remove("active");
-    document.getElementById("level2Btn").classList.remove("active");
-    document.getElementById("level3Btn").classList.remove("active");
-    document.getElementById(selectedBtnId).classList.add("active");
-}
-
-function startGame(brickArrangement = null) {
-
-
-        // 隱藏主題更換相關按鈕
-        uploadBrickThemeBtn.style.display = 'none';
-    resetBrickThemeBtn.style.display = 'none';
-
-    if (isRunning) return;  // 如果遊戲已在運行，則不再重啟
-
-    isRunning = true;  // 設置遊戲為運行狀態
-
-    console.log("Game started with arrangement:", brickArrangement);
-    canvas.style.display = "block";  // 顯示畫布
-
-        // 初始化獎勵相關的狀態
-    nextRewardScore = scoreThreshold;  // 重置獎勵門檻
-
-    dx = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
-    dy = (Math.random() * -2 - 1);
-
-
-
-
-    // 初始化遊戲狀態
-    isGameOver = false;
-    isLevelComplete = false;
-    timeRemaining = timeLimit;  // 重置剩餘時間
-    ctx.clearRect(0, 0, canvas.width, canvas.height);  // 清空畫布
-
-    // 隱藏按鈕和選項
-    document.getElementById("difficultyButtons").style.display = "none";
-    document.getElementById("levelButtons").style.display = "none";
-    startBtn.style.display = "none";
-
-    // 重置計時器
-    clearInterval(timerInterval);
-    timerInterval = setInterval(function() {
-        timeRemaining--;
-        if (timeRemaining <= 0) {
-            timeRemaining = 0;
-            isGameOver = true;
-            clearInterval(timerInterval);
-        }
-    }, 1000);
-
-    // 重置球的速度
-    resetSpeed();
-
-    // 播放背景音樂（僅在 isMusicPlaying 為 true 時）
-    const backgroundMusic = document.getElementById("backgroundMusic");
-    if (!backgroundMusic.src) {
-        backgroundMusic.src = "music/GODS.mp3";  // 設置預設音樂
-    }
-    if (isMusicPlaying) {  // 檢查音樂狀態是否允許播放
-        backgroundMusic.play();
-    }
-    backgroundMusic.volume = 0.5;
-
-    // 根據選擇的難度來設定磚塊參數
-    if (difficulty === "easy") {
-        brickRowCount = 3;
-        brickColumnCount = 5;
-        brickWidth = 75;
-        brickHeight = 20;
-        generateBricks(brickArrangement);
-    } else if (difficulty === "medium") {
-        brickRowCount = 4;
-        brickColumnCount = 6;
-        brickWidth = 70;
-        brickHeight = 20;
-        generateDefaultBricks("medium");
-    } else if (difficulty === "hard") {
-        brickRowCount = 5;
-        brickColumnCount = 7;
-        brickWidth = 65;
-        brickHeight = 20;
-        generateDefaultBricks("hard");
-    }
-
-    // 重置球的位置
-    x = canvas.width / 2;
-    y = canvas.height - 30;
-
-    // 開始繪製遊戲畫面
-    draw();
-}
-
-
-
-
-
-
-
-
-
-
-
-
-function generateBricks(arrangement) {
-    bricks = []; // 清空磚塊陣列
-    // 動態計算每個磚塊的寬度以適應畫布寬度
-    brickWidth = (canvas.width - (brickColumnCount - 1) * brickPadding - 2 * brickOffsetLeft) / brickColumnCount;
-
-    for (let c = 0; c < brickColumnCount; c++) {
-        bricks[c] = [];
-        for (let r = 0; r < brickRowCount; r++) {
-            let status = arrangement[r][c];  // 根據傳入的排列數據決定磚塊是否存在
-            let hitPoints = 1;  // 預設需要1次擊打
-            if (difficulty === "medium" && status === 1 && Math.random() < 0.5) {
-                hitPoints = 2;  // 中等難度有部分需要2次擊打
-            } else if (difficulty === "hard" && status === 1) {
-                hitPoints = Math.floor(Math.random() * 3) + 1;  // 困難難度隨機需要1-3次擊打
+                // 關閉音樂清單
+                musicListModal.style.display = "none";
             }
+        });
 
-            // 根據 status 決定是否生成磚塊
-            if (status === 1) {
-                bricks[c][r] = { x: 0, y: 0, status: 1, hitPoints: hitPoints };
-            } else {
-                bricks[c][r] = { x: 0, y: 0, status: 0 };  // 沒有磚塊的地方
+
+        // 點擊模態框外部時關閉
+        window.addEventListener("click", (event) => {
+            if (event.target === musicListModal) {
+                musicListModal.style.display = "none";
+            }
+        });
+
+        // 檢查是否已選擇難度和背景來啟用關卡選擇按鈕
+        function checkIfReadyToStart() {
+            if (difficulty && currentBackground.src) {
+                document.getElementById("levelButtons").style.display = "block";  // 顯示 Level 按鈕
             }
         }
-    }
-}
+
+        // 選擇難度按鈕事件
+        document.getElementById("easyBtn").addEventListener("click", function () {
+            difficulty = "easy";
+            highlightSelectedDifficulty("easyBtn");
+            checkIfReadyToStart();  // 檢查是否已準備好開始遊戲
+        });
+        document.getElementById("mediumBtn").addEventListener("click", function () {
+            difficulty = "medium";
+            highlightSelectedDifficulty("mediumBtn");
+            checkIfReadyToStart();  // 檢查是否已準備好開始遊戲
+        });
+        document.getElementById("hardBtn").addEventListener("click", function () {
+            difficulty = "hard";
+            highlightSelectedDifficulty("hardBtn");
+            checkIfReadyToStart();  // 檢查是否已準備好開始遊戲
+        });
+
+        function highlightSelectedDifficulty(selectedBtnId) {
+            document.getElementById("easyBtn").classList.remove("active");
+            document.getElementById("mediumBtn").classList.remove("active");
+            document.getElementById("hardBtn").classList.remove("active");
+            document.getElementById(selectedBtnId).classList.add("active");
+        }
+
+        // 點擊按鈕開始遊戲
+        // 點擊按鈕開始遊戲
+        const startBtn = document.getElementById("startBtn");
+        const hideElementsCheckbox = document.getElementById("hideElementsCheckbox");
 
 
+        // 選擇要隱藏的元素（可以是按鈕或其他控件）
+        const elementsToHide = [
+            document.getElementById("difficultyButtons"),
+            document.getElementById("levelButtons"),
+            document.getElementById("musicSelectBtn"),
+            document.getElementById("backgroundSelectBtn")
+        ];
 
-function drawBall() {
-    // 存儲當前球的位置到歷史位置陣列
-    trail.push({ x: x, y: y });
-    if (trail.length > maxTrailLength) {
-        trail.shift();  // 移除最舊的尾跡點
-    }
+        // 點擊按鈕開始遊戲
+        startBtn.addEventListener("click", function () {
+            // 檢查是否已選擇難度
+            if (!difficulty) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '選擇難度',
+                    text: '請選擇難度！'
+                });
+                return;  // 停止遊戲開始
+            }
 
-    // 繪製尾跡（歷史位置）
-    for (let i = 0; i < trail.length; i++) {
-        let alpha = i / trail.length;  // 透明度從低到高
-        ctx.beginPath();
-        ctx.arc(trail[i].x, trail[i].y, ballRadius, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(0, 149, 221," + alpha + ")";  // 隨著位置的遠近改變透明度
-        ctx.fill();
-        ctx.closePath();
-    }
+            // 檢查是否已選擇Level
+            if (selectedLevelIndex === null) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '選擇關卡',
+                    text: '請選擇Level！'
+                });
+                return;  // 停止遊戲開始
+            }
 
-    // 繪製當前球的位置
-    ctx.beginPath();
-    ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
-    ctx.fillStyle = "#0095DD";
-    ctx.fill();
-    ctx.closePath();
-}
-
-
-function drawPaddle() {
-    ctx.beginPath();
-    ctx.rect(paddleX, paddleY, paddleWidth, paddleHeight);  // 使用 paddleY 控制擋板 Y 軸
-    ctx.fillStyle = "#0095DD";
-    ctx.fill();
-    ctx.closePath();
-}
-
-
-function drawBricks() {
-    for (let c = 0; c < bricks.length; c++) {
-        for (let r = 0; r < bricks[c].length; r++) {
-            if (bricks[c][r].status === 1) {  // 只繪製 status 為 1 的磚塊
-                let brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
-                let brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
-                bricks[c][r].x = brickX;
-                bricks[c][r].y = brickY;
-
-                ctx.save();  // 保存畫布狀態
-                ctx.beginPath();
-                ctx.rect(brickX, brickY, brickWidth, brickHeight);
-
-                if (brickThemeImage) {
-                    // 如果有上傳圖片，將圖片分割成拼圖效果
-                    let pieceWidth = brickThemeImage.width / brickColumnCount;
-                    let pieceHeight = brickThemeImage.height / brickRowCount;
-
-                    // 將圖片的片段繪製到每個磚塊上
-                    ctx.drawImage(
-                        brickThemeImage,
-                        c * pieceWidth, r * pieceHeight, // 來源圖片位置
-                        pieceWidth, pieceHeight,         // 來源圖片大小
-                        brickX, brickY,                  // 繪製位置
-                        brickWidth, brickHeight          // 繪製大小
-                    );
-
-                    // 添加陰影效果
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-                    ctx.shadowBlur = 5;
-                    ctx.shadowOffsetX = 2;
-                    ctx.shadowOffsetY = 2;
-                } else {
-                    // 無圖片時，使用顏色並無陰影
-                    ctx.shadowColor = 'transparent';
-                    let color = getColorByHitPoints(bricks[c][r].hitPoints);
-                    ctx.fillStyle = color;
-                    ctx.fill();
+            startBtn.addEventListener("click", function () {
+                // 檢查是否勾選「隱藏按鈕」選項
+                if (hideElementsCheckbox.checked) {
+                    elementsToHide.forEach(element => {
+                        element.style.display = "none"; // 隱藏元素
+                    });
                 }
 
-                ctx.closePath();
-                ctx.restore();  // 還原狀態，移除陰影
+                // 在這裡啟動遊戲的其他邏輯，例如開始遊戲
+                startGame();
+            });
+            // 隱藏按鈕和選項
+            startBtn.style.display = "none";
+            document.getElementById("difficultyButtons").style.display = "none";
+            document.getElementById("levelButtons").style.display = "none";
 
-                // 顯示擊打次數
-                ctx.save();
-                ctx.font = "16px Arial";
-                ctx.fillStyle = "#000000";
-                ctx.fillText(bricks[c][r].hitPoints, brickX + brickWidth / 2 - 5, brickY + brickHeight / 2 + 5);
-                ctx.restore();
+            // 根據選擇的難度和Level來啟動遊戲
+            let selectedLevel;
+            if (difficulty === "easy") {
+                selectedLevel = easyLevels[selectedLevelIndex];
+            } else if (difficulty === "medium") {
+                selectedLevel = mediumLevels[selectedLevelIndex];
+            } else if (difficulty === "hard") {
+                selectedLevel = hardLevels[selectedLevelIndex];
+            }
+
+            startGame(selectedLevel.brickArrangement);  // 開始遊戲並傳入所選的關卡磚塊排列
+        });
+
+
+
+
+
+        const backgroundImages = {
+            night: "background/夜空.png",
+            forest: "background/森林.png"
+        };
+
+
+
+        let currentBackground = new Image();
+        currentBackground.src = backgroundImages.night;  // 預設為夜空
+
+
+
+
+        // 修改滑鼠事件進行擋板跳躍和回到原點
+        canvas.addEventListener("mousedown", function (e) {
+            if (!canJump) return;  // 如果還在冷卻中，則不允許跳躍
+
+            if (e.button === 0) {  // 左鍵點擊，讓擋板跳躍
+                const originalPaddleY = paddleY;  // 記錄擋板的原始位置
+                paddleY = Math.max(paddleY - paddleJumpDistance, 0);  // 擋板向上移動，防止超出上邊界
+
+                // 使用定時器讓擋板在跳躍後返回原點
+                setTimeout(function () {
+                    paddleY = originalPaddleY;  // 擋板回到初始位置
+                }, 300);  // 設定回到原點的延遲時間，單位為毫秒（例如 300ms）
+
+            } else if (e.button === 2) {  // 右鍵點擊，讓擋板向下移動
+                paddleY = Math.min(paddleY + paddleJumpDistance, canvas.height - paddleHeight);  // 防止超出下邊界
+            }
+
+            // 開啟冷卻時間以避免過於頻繁的跳躍
+            canJump = false;
+            setTimeout(function () {
+                canJump = true;  // 冷卻時間結束後允許跳躍
+            }, jumpCooldown);
+        });
+
+        // 禁止右鍵彈出功能表
+        canvas.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
+        });
+
+        // 處理跳躍時的球與擋板的碰撞
+        function handleJumpCollision() {
+            // 在跳躍期間檢查球是否碰到擋板
+            if (y + ballRadius >= paddleY && y + ballRadius <= paddleY + paddleHeight &&
+                x > paddleX && x < paddleX + paddleWidth) {
+                dy = -dy;  // 擋板反彈
             }
         }
-    }
-}
 
-// 幫助函數：根據磚塊的 hitPoints 返回相應顏色
-function getColorByHitPoints(hitPoints) {
-    if (hitPoints === 3) return "#FF0000";  // 紅色
-    if (hitPoints === 2) return "#FFA500";  // 橙色
-    return "#FFFF00";  // 黃色
-}
+        // 選擇關卡按鈕事件
+        document.getElementById("level1Btn").addEventListener("click", function () {
+            selectedLevelIndex = 0;
+            highlightSelectedLevel("level1Btn");
+        });
+        document.getElementById("level2Btn").addEventListener("click", function () {
+            selectedLevelIndex = 1;
+            highlightSelectedLevel("level2Btn");
+        });
+        document.getElementById("level3Btn").addEventListener("click", function () {
+            selectedLevelIndex = 2;
+            highlightSelectedLevel("level3Btn");
+        });
+
+        function highlightSelectedLevel(selectedBtnId) {
+            document.getElementById("level1Btn").classList.remove("active");
+            document.getElementById("level2Btn").classList.remove("active");
+            document.getElementById("level3Btn").classList.remove("active");
+            document.getElementById(selectedBtnId).classList.add("active");
+        }
+
+        function startGame(brickArrangement = null) {
+
+
+            // 隱藏主題更換相關按鈕
+            uploadBrickThemeBtn.style.display = 'none';
+            resetBrickThemeBtn.style.display = 'none';
+
+            if (isRunning) return;  // 如果遊戲已在運行，則不再重啟
+
+            isRunning = true;  // 設置遊戲為運行狀態
+
+            console.log("Game started with arrangement:", brickArrangement);
+            canvas.style.display = "block";  // 顯示畫布
+
+            // 初始化獎勵相關的狀態
+            nextRewardScore = scoreThreshold;  // 重置獎勵門檻
+
+            dx = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
+            dy = (Math.random() * -2 - 1);
+
+
+
+
+            // 初始化遊戲狀態
+            isGameOver = false;
+            isLevelComplete = false;
+            timeRemaining = timeLimit;  // 重置剩餘時間
+            ctx.clearRect(0, 0, canvas.width, canvas.height);  // 清空畫布
+
+            // 隱藏按鈕和選項
+            document.getElementById("difficultyButtons").style.display = "none";
+            document.getElementById("levelButtons").style.display = "none";
+            startBtn.style.display = "none";
+
+            // 重置計時器
+            clearInterval(timerInterval);
+            timerInterval = setInterval(function () {
+                timeRemaining--;
+                if (timeRemaining <= 0) {
+                    timeRemaining = 0;
+                    isGameOver = true;
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+
+            // 重置球的速度
+            resetSpeed();
+
+            // 播放背景音樂（僅在 isMusicPlaying 為 true 時）
+            const backgroundMusic = document.getElementById("backgroundMusic");
+            if (!backgroundMusic.src) {
+                backgroundMusic.src = "music/GODS.mp3";  // 設置預設音樂
+            }
+            if (isMusicPlaying) {  // 檢查音樂狀態是否允許播放
+                backgroundMusic.play();
+            }
+            backgroundMusic.volume = 0.5;
+
+            // 根據選擇的難度來設定磚塊參數
+            if (difficulty === "easy") {
+                brickRowCount = 3;
+                brickColumnCount = 5;
+                brickWidth = 75;
+                brickHeight = 20;
+                generateBricks(brickArrangement);
+            } else if (difficulty === "medium") {
+                brickRowCount = 4;
+                brickColumnCount = 6;
+                brickWidth = 70;
+                brickHeight = 20;
+                generateDefaultBricks("medium");
+            } else if (difficulty === "hard") {
+                brickRowCount = 5;
+                brickColumnCount = 7;
+                brickWidth = 65;
+                brickHeight = 20;
+                generateDefaultBricks("hard");
+            }
+
+            // 重置球的位置
+            x = canvas.width / 2;
+            y = canvas.height - 30;
+
+            // 開始繪製遊戲畫面
+            draw();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        function generateBricks(arrangement) {
+            bricks = []; // 清空磚塊陣列
+            // 動態計算每個磚塊的寬度以適應畫布寬度
+            brickWidth = (canvas.width - (brickColumnCount - 1) * brickPadding - 2 * brickOffsetLeft) / brickColumnCount;
+
+            for (let c = 0; c < brickColumnCount; c++) {
+                bricks[c] = [];
+                for (let r = 0; r < brickRowCount; r++) {
+                    let status = arrangement[r][c];  // 根據傳入的排列數據決定磚塊是否存在
+                    let hitPoints = 1;  // 預設需要1次擊打
+                    if (difficulty === "medium" && status === 1 && Math.random() < 0.5) {
+                        hitPoints = 2;  // 中等難度有部分需要2次擊打
+                    } else if (difficulty === "hard" && status === 1) {
+                        hitPoints = Math.floor(Math.random() * 3) + 1;  // 困難難度隨機需要1-3次擊打
+                    }
+
+                    // 根據 status 決定是否生成磚塊
+                    if (status === 1) {
+                        bricks[c][r] = { x: 0, y: 0, status: 1, hitPoints: hitPoints };
+                    } else {
+                        bricks[c][r] = { x: 0, y: 0, status: 0 };  // 沒有磚塊的地方
+                    }
+                }
+            }
+        }
+
+
+
+        function drawBall() {
+            // 存儲當前球的位置到歷史位置陣列
+            trail.push({ x: x, y: y });
+            if (trail.length > maxTrailLength) {
+                trail.shift();  // 移除最舊的尾跡點
+            }
+
+            // 繪製尾跡（歷史位置）
+            for (let i = 0; i < trail.length; i++) {
+                let alpha = i / trail.length;  // 透明度從低到高
+                ctx.beginPath();
+                ctx.arc(trail[i].x, trail[i].y, ballRadius, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(0, 149, 221," + alpha + ")";  // 隨著位置的遠近改變透明度
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            // 繪製當前球的位置
+            ctx.beginPath();
+            ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+
+        function drawPaddle() {
+            ctx.beginPath();
+            ctx.rect(paddleX, paddleY, paddleWidth, paddleHeight);  // 使用 paddleY 控制擋板 Y 軸
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+
+        function drawBricks() {
+            for (let c = 0; c < bricks.length; c++) {
+                for (let r = 0; r < bricks[c].length; r++) {
+                    if (bricks[c][r].status === 1) {  // 只繪製 status 為 1 的磚塊
+                        let brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+                        let brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+                        bricks[c][r].x = brickX;
+                        bricks[c][r].y = brickY;
+
+                        ctx.save();  // 保存畫布狀態
+                        ctx.beginPath();
+                        ctx.rect(brickX, brickY, brickWidth, brickHeight);
+
+                        if (brickThemeImage) {
+                            // 如果有上傳圖片，將圖片分割成拼圖效果
+                            let pieceWidth = brickThemeImage.width / brickColumnCount;
+                            let pieceHeight = brickThemeImage.height / brickRowCount;
+
+                            // 將圖片的片段繪製到每個磚塊上
+                            ctx.drawImage(
+                                brickThemeImage,
+                                c * pieceWidth, r * pieceHeight, // 來源圖片位置
+                                pieceWidth, pieceHeight,         // 來源圖片大小
+                                brickX, brickY,                  // 繪製位置
+                                brickWidth, brickHeight          // 繪製大小
+                            );
+
+                            // 添加陰影效果
+                            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                            ctx.shadowBlur = 5;
+                            ctx.shadowOffsetX = 2;
+                            ctx.shadowOffsetY = 2;
+                        } else {
+                            // 無圖片時，使用顏色並無陰影
+                            ctx.shadowColor = 'transparent';
+                            let color = getColorByHitPoints(bricks[c][r].hitPoints);
+                            ctx.fillStyle = color;
+                            ctx.fill();
+                        }
+
+                        ctx.closePath();
+                        ctx.restore();  // 還原狀態，移除陰影
+
+                        // 顯示擊打次數
+                        ctx.save();
+                        ctx.font = "16px Arial";
+                        ctx.fillStyle = "#000000";
+                        ctx.fillText(bricks[c][r].hitPoints, brickX + brickWidth / 2 - 5, brickY + brickHeight / 2 + 5);
+                        ctx.restore();
+                    }
+                }
+            }
+        }
+
+        // 幫助函數：根據磚塊的 hitPoints 返回相應顏色
+        function getColorByHitPoints(hitPoints) {
+            if (hitPoints === 3) return "#FF0000";  // 紅色
+            if (hitPoints === 2) return "#FFA500";  // 橙色
+            return "#FFFF00";  // 黃色
+        }
 
 
 
 
         function drawScore() {
-    ctx.font = "16px Arial";
-    ctx.fillStyle = "#0095DD";
-    ctx.fillText("Score: " + score, 100, 20);
-}
-
-
-function drawGameOver() {
-    if (!isGameOver) return;  // 確認遊戲確實處於結束狀態
-
-    // 停止音樂
-    const backgroundMusic = document.getElementById("backgroundMusic");
-    backgroundMusic.pause();
-    backgroundMusic.currentTime = 0;
-
-    // 停止動畫和計時器
-    cancelAnimationFrame(animationId);
-    clearInterval(timerInterval);
-
-    // 清空畫布
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 使用 SweetAlert2 顯示遊戲結束的彈窗
-    Swal.fire({
-        icon: 'error',
-        title: '遊戲結束',
-        text: `你死了！你的分數是：${score}，最終生命值為：${lives}`,
-        confirmButtonText: '重新開始'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            resetGameToMenu();  // 回到主選單並重置所有設定
-        }
-    });
-}
-
-
-
-
-
-
-
-
-
-
-function draw() {
-    if (isGameOver) {
-        drawGameOver();  // 顯示遊戲結束結果
-        cancelAnimationFrame(animationId);  // 停止動畫循環
-        return;  // 停止更新畫面
-    }
-
-    if (isLevelComplete) {
-        drawLevelComplete();  // 顯示過關動畫
-        cancelAnimationFrame(animationId);  // 停止動畫循環
-        return;  // 停止更新畫面
-    }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // 清除畫布
-
-    // 繪製背景圖片
-    ctx.drawImage(currentBackground, 0, 0, canvas.width, canvas.height);
-
-    drawBricks();
-    drawBall();
-    drawPaddle();
-    drawScore();
-    drawLives();
-    drawTimer();  // 繪製倒數計時
-    drawCombo();  // 在左下角顯示 combo 計數
-    updateParticles();  // 更新和繪製粒子動畫
-    collisionDetection();
-
-    // 分步檢測，避免球跳過擋板
-    let steps = 5;  // 將球的運動分成幾步進行檢測
-    let stepX = dx / steps;
-    let stepY = dy / steps;
-
-    for (let i = 0; i < steps; i++) {
-        x += stepX;
-        y += stepY;
-
-        // 邊界檢測和球的反彈邏輯
-        if (x + ballRadius > canvas.width || x - ballRadius < 0) {
-            dx = -dx;  // 左右邊界反彈
-            break;
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#0095DD";
+            ctx.fillText("Score: " + score, 100, 20);
         }
 
-        if (y - ballRadius < 0) {
-            dy = -dy;  // 頂部邊界反彈
-            break;
+
+        function drawGameOver() {
+            if (!isGameOver) return;  // 確認遊戲確實處於結束狀態
+
+            // 停止音樂
+            const backgroundMusic = document.getElementById("backgroundMusic");
+            backgroundMusic.pause();
+            backgroundMusic.currentTime = 0;
+
+            // 停止動畫和計時器
+            cancelAnimationFrame(animationId);
+            clearInterval(timerInterval);
+
+            // 清空畫布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 使用 SweetAlert2 顯示遊戲結束的彈窗
+            Swal.fire({
+                icon: 'error',
+                title: '遊戲結束',
+                text: `你死了！你的分數是：${score}，最終生命值為：${lives}`,
+                confirmButtonText: '重新開始'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    resetGameToMenu();  // 回到主選單並重置所有設定
+                }
+            });
         }
 
-        // 檢查球是否碰到擋板
-        // 增強檢測範圍，確保球在擋板跳躍期間能被正確反彈
-        if (y + ballRadius >= paddleY && y - ballRadius <= paddleY + paddleHeight && x > paddleX && x < paddleX + paddleWidth) {
-            // 如果球的底部碰到擋板的頂部，並且擋板正在向上跳躍，也處理反彈
-            if (y + ballRadius >= paddleY && y + stepY > 0) {
-                dy = -dy;  // 擋板反彈
-                y = paddleY - ballRadius;  // 防止球嵌入擋板
-                break;
+
+
+
+
+
+
+
+
+
+        function draw() {
+            if (isGameOver) {
+                drawGameOver();  // 顯示遊戲結束結果
+                cancelAnimationFrame(animationId);  // 停止動畫循環
+                return;  // 停止更新畫面
             }
-        }
 
-
-        // 球掉到底部時失去一條生命
-        if (y + ballRadius > canvas.height) {
-            lives--;
-            comboCount = 0;  // 重置 combo 計數
-            if (lives === 0) {
-                isGameOver = true;  // 生命用完，遊戲結束
-            } else {
-                resetBall();  // 重置球的位置
+            if (isLevelComplete) {
+                drawLevelComplete();  // 顯示過關動畫
+                cancelAnimationFrame(animationId);  // 停止動畫循環
+                return;  // 停止更新畫面
             }
-            break;
-        }
-    }
 
-    // 擋板左右移動控制
-    if (rightPressed && paddleX < canvas.width - paddleWidth) {
-        paddleX += 7;
-    } else if (leftPressed && paddleX > 0) {
-        paddleX -= 7;
-    }
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // 清除畫布
 
-    // 存儲 requestAnimationFrame 的 ID，便於取消動畫循環
-    animationId = requestAnimationFrame(draw);  // 持續更新畫面
-}
+            // 繪製背景圖片
+            ctx.drawImage(currentBackground, 0, 0, canvas.width, canvas.height);
 
+            drawBricks();
+            drawBall();
+            drawPaddle();
+            drawScore();
+            drawLives();
+            drawTimer();  // 繪製倒數計時
+            drawCombo();  // 在左下角顯示 combo 計數
+            updateParticles();  // 更新和繪製粒子動畫
+            collisionDetection();
 
+            // 分步檢測，避免球跳過擋板
+            let steps = 5;  // 將球的運動分成幾步進行檢測
+            let stepX = dx / steps;
+            let stepY = dy / steps;
 
+            for (let i = 0; i < steps; i++) {
+                x += stepX;
+                y += stepY;
 
+                // 邊界檢測和球的反彈邏輯
+                if (x + ballRadius > canvas.width || x - ballRadius < 0) {
+                    dx = -dx;  // 左右邊界反彈
+                    break;
+                }
 
-let isBallFalling = false;  // 新增變數來記錄球是否正在掉落
-function resetBall() {
-    x = canvas.width / 2;
-    y = canvas.height - 30;
+                if (y - ballRadius < 0) {
+                    dy = -dy;  // 頂部邊界反彈
+                    break;
+                }
 
-    // 隨機生成水平速度（左或右），確保垂直速度向上
-    dx = (Math.random() > 0.5 ? 1 : -1) * 2; // 隨機向左或向右
-    dy = -Math.abs(dy); // 強制垂直速度向上（確保 dy 是負值）
-}
-
-
-
-
-
-
-
-// 在碰撞檢測中增加連擊處理
-function collisionDetection() {
-    const hitSound = document.getElementById("hitSound");
-
-    let allBricksCleared = true;  // 標記所有磚塊是否被清除
-    let collisionOccurred = false;  // 紀錄是否發生碰撞
-
-    for (let c = 0; c < bricks.length; c++) {
-        for (let r = 0; r < bricks[c].length; r++) {
-            let b = bricks[c][r];
-            if (b.status == 1) {
-                allBricksCleared = false;  // 尚有磚塊未被清除
-
-                // 檢測球的四個邊與磚塊是否相交
-                if (x + ballRadius > b.x && x - ballRadius < b.x + brickWidth &&
-                    y + ballRadius > b.y && y - ballRadius < b.y + brickHeight) {
-
-                    // 播放擊打音效
-                    hitSound.currentTime = 0;
-                    hitSound.play();
-
-                    // 檢測球是從哪個方向碰撞並立即反彈
-                    let ballHitFromTopOrBottom = y - ballRadius <= b.y + brickHeight && y + ballRadius >= b.y;
-                    let ballHitFromSides = x - ballRadius <= b.x + brickWidth && x + ballRadius >= b.x;
-
-                    // 垂直方向反彈
-                    if (ballHitFromTopOrBottom && !collisionOccurred) {
-                        dy = -dy;  // 改變球的垂直方向
-                        collisionOccurred = true;  // 標記已發生碰撞
+                // 檢查球是否碰到擋板
+                // 增強檢測範圍，確保球在擋板跳躍期間能被正確反彈
+                if (y + ballRadius >= paddleY && y - ballRadius <= paddleY + paddleHeight && x > paddleX && x < paddleX + paddleWidth) {
+                    // 如果球的底部碰到擋板的頂部，並且擋板正在向上跳躍，也處理反彈
+                    if (y + ballRadius >= paddleY && y + stepY > 0) {
+                        dy = -dy;  // 擋板反彈
+                        y = paddleY - ballRadius;  // 防止球嵌入擋板
+                        break;
                     }
+                }
 
-                    // 水平方向反彈
-                    if (ballHitFromSides && !collisionOccurred) {
-                        dx = -dx;  // 改變球的水平方向
-                        collisionOccurred = true;  // 標記已發生碰撞
-                    }
 
-                    // 確保只處理一次磚塊碰撞後的反彈，並減少磚塊擊打次數
-                    if (b.hitPoints > 1) {
-                        b.hitPoints--;  // 減少磚塊的擊打次數
+                // 球掉到底部時失去一條生命
+                if (y + ballRadius > canvas.height) {
+                    lives--;
+                    comboCount = 0;  // 重置 combo 計數
+                    if (lives === 0) {
+                        isGameOver = true;  // 生命用完，遊戲結束
                     } else {
-                        b.status = 0;  // 移除磚塊
-
-                        // 增加連擊次數
-                        comboCount++;
-
-                        // 根據連擊次數計算分數加成，從 x2 開始加分（3 分）
-                        if (comboCount >= 2) {
-                            score += 3;  // 連擊 x2 或以上給予 3 分
-                        } else {
-                            score += 1;  // 普通磚塊給予 1 分
-                        }
-
-                        if (b.hitPoints <= 1) {
-                            b.status = 0;  // 磚塊被擊破
-                            score++;  // 增加分數
-                            createExplosion(b.x + brickWidth / 2, b.y + brickHeight / 2);  // 在磚塊中心觸發爆炸效果
-                        }
-
-
-                        // 提升球的速度
-                        increaseBallSpeed();  // 增加球的速度
-
-                        // 檢查是否獲得獎勵，連擊分數影響獎勵
-                        checkForReward();
+                        resetBall();  // 重置球的位置
                     }
-
-                    return;  // 確保一次碰撞後立刻退出檢測
+                    break;
                 }
             }
-        }
-    }
 
-    // 如果所有磚塊都被清除，設置過關狀態
-    if (allBricksCleared) {
-        isLevelComplete = true;
-        handleLevelComplete();  // 跳轉到下一關
-    }
-}
+            // 擋板左右移動控制
+            if (rightPressed && paddleX < canvas.width - paddleWidth) {
+                paddleX += 7;
+            } else if (leftPressed && paddleX > 0) {
+                paddleX -= 7;
+            }
+
+            // 存儲 requestAnimationFrame 的 ID，便於取消動畫循環
+            animationId = requestAnimationFrame(draw);  // 持續更新畫面
+        }
+
+
+
+
+
+        let isBallFalling = false;  // 新增變數來記錄球是否正在掉落
+        function resetBall() {
+            x = canvas.width / 2;
+            y = canvas.height - 30;
+
+            // 隨機生成水平速度（左或右），確保垂直速度向上
+            dx = (Math.random() > 0.5 ? 1 : -1) * 2; // 隨機向左或向右
+            dy = -Math.abs(dy); // 強制垂直速度向上（確保 dy 是負值）
+        }
+
+
+
+
+
+
+
+        // 在碰撞檢測中增加連擊處理
+        function collisionDetection() {
+            const hitSound = document.getElementById("hitSound");
+
+            let allBricksCleared = true;  // 標記所有磚塊是否被清除
+            let collisionOccurred = false;  // 紀錄是否發生碰撞
+
+            for (let c = 0; c < bricks.length; c++) {
+                for (let r = 0; r < bricks[c].length; r++) {
+                    let b = bricks[c][r];
+                    if (b.status == 1) {
+                        allBricksCleared = false;  // 尚有磚塊未被清除
+
+                        // 檢測球的四個邊與磚塊是否相交
+                        if (x + ballRadius > b.x && x - ballRadius < b.x + brickWidth &&
+                            y + ballRadius > b.y && y - ballRadius < b.y + brickHeight) {
+
+                            // 播放擊打音效
+                            hitSound.currentTime = 0;
+                            hitSound.play();
+
+                            // 檢測球是從哪個方向碰撞並立即反彈
+                            let ballHitFromTopOrBottom = y - ballRadius <= b.y + brickHeight && y + ballRadius >= b.y;
+                            let ballHitFromSides = x - ballRadius <= b.x + brickWidth && x + ballRadius >= b.x;
+
+                            // 垂直方向反彈
+                            if (ballHitFromTopOrBottom && !collisionOccurred) {
+                                dy = -dy;  // 改變球的垂直方向
+                                collisionOccurred = true;  // 標記已發生碰撞
+                            }
+
+                            // 水平方向反彈
+                            if (ballHitFromSides && !collisionOccurred) {
+                                dx = -dx;  // 改變球的水平方向
+                                collisionOccurred = true;  // 標記已發生碰撞
+                            }
+
+                            // 確保只處理一次磚塊碰撞後的反彈，並減少磚塊擊打次數
+                            if (b.hitPoints > 1) {
+                                b.hitPoints--;  // 減少磚塊的擊打次數
+                            } else {
+                                b.status = 0;  // 移除磚塊
+
+                                // 增加連擊次數
+                                comboCount++;
+
+                                // 根據連擊次數計算分數加成，從 x2 開始加分（3 分）
+                                if (comboCount >= 2) {
+                                    score += 3;  // 連擊 x2 或以上給予 3 分
+                                } else {
+                                    score += 1;  // 普通磚塊給予 1 分
+                                }
+
+                                if (b.hitPoints <= 1) {
+                                    b.status = 0;  // 磚塊被擊破
+                                    score++;  // 增加分數
+                                    createExplosion(b.x + brickWidth / 2, b.y + brickHeight / 2);  // 在磚塊中心觸發爆炸效果
+                                }
+
+
+                                // 提升球的速度
+                                increaseBallSpeed();  // 增加球的速度
+
+                                // 檢查是否獲得獎勵，連擊分數影響獎勵
+                                checkForReward();
+                            }
+
+                            return;  // 確保一次碰撞後立刻退出檢測
+                        }
+                    }
+                }
+            }
+
+            // 如果所有磚塊都被清除，設置過關狀態
+            if (allBricksCleared) {
+                isLevelComplete = true;
+                handleLevelComplete();  // 跳轉到下一關
+            }
+        }
 
 
 
@@ -1585,492 +1689,492 @@ function collisionDetection() {
         }
 
         // 點擊畫布重新開始遊戲
-        canvas.addEventListener("click", function() {
+        canvas.addEventListener("click", function () {
             if (isGameOver) {
                 restartGame();
             }
         });
 
         function restartGame() {
-    // 重置遊戲狀態
-    score = 0;
-    lives = 3;
-    timeRemaining = timeLimit;
-    isGameOver = false;
-    isLevelComplete = false;
-    selectedLevelIndex = null;  
-    difficulty = null;  
+            // 重置遊戲狀態
+            score = 0;
+            lives = 3;
+            timeRemaining = timeLimit;
+            isGameOver = false;
+            isLevelComplete = false;
+            selectedLevelIndex = null;
+            difficulty = null;
 
-    // 重置 combo 計數器
-    comboCount = 0;
-    comboBonus = 0;
+            // 重置 combo 計數器
+            comboCount = 0;
+            comboBonus = 0;
 
-    // 重置獎勵機制的計數器
-    nextRewardScore = scoreThreshold;
+            // 重置獎勵機制的計數器
+            nextRewardScore = scoreThreshold;
 
-    // 顯示難度和關卡選擇按鈕
-    document.getElementById("difficultyButtons").style.display = "block";
-    document.getElementById("levelButtons").style.display = "block";
-    startBtn.style.display = "block";
+            // 顯示難度和關卡選擇按鈕
+            document.getElementById("difficultyButtons").style.display = "block";
+            document.getElementById("levelButtons").style.display = "block";
+            startBtn.style.display = "block";
 
-    startBtn.removeEventListener("click", startGame);
-    startBtn.addEventListener("click", function () {
-        if (!difficulty) {
-            alert("請選擇難度！");
-            return;
-        }
-        if (selectedLevelIndex === null) {
-            alert("請選擇關卡！");
-            return;
-        }
-        startGame();
-    });
-}
-
-
-
-
-
-
-
-function drawLives() {
-    ctx.font = "16px Arial";
-    ctx.fillStyle = "#0095DD";
-    ctx.fillText("生命值：" + lives, canvas.width - 90, 20);  // 顯示當前生命值
-}
-
-function checkAllBricksCleared() {
-    for (let c = 0; c < bricks.length; c++) {
-        for (let r = 0; r < bricks[c].length; r++) {
-            if (bricks[c][r].status === 1) {
-                return false;  // 還有磚塊存在
-            }
-        }
-    }
-    return true;  // 所有磚塊已被擊破
-}
-
-function drawLevelComplete() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);  // 清除畫布
-
-    ctx.font = "24px Arial";
-    ctx.fillStyle = "#000000";
-    ctx.textAlign = "center";  // 使文字居中對齊
-
-    // 顯示 "恭喜過關！" 和 "最終分數"
-    ctx.fillText("恭喜過關！", canvas.width / 2, canvas.height / 2 - 20);
-    ctx.fillText("你的分數: " + score, canvas.width / 2, canvas.height / 2 + 20);
-
-    // 延遲2秒後自動進入下一關
-    setTimeout(() => {
-        moveToNextLevel();
-    }, 2000);  // 延遲2秒後開始下一關
-}
-
-
-function handleLevelComplete() {
-    isLevelComplete = true;
-    drawLevelComplete();  // 顯示過關訊息
-
-    // 停止計時器和動畫循環
-    clearInterval(timerInterval);
-    cancelAnimationFrame(animationId);
-
-    setTimeout(() => {
-        if (selectedLevelIndex < 2) {  
-            selectedLevelIndex++;
-            isRunning = false;
-            startNextLevel();
-        } else {
-            // 已完成最後一關時提示保存紀錄
-            Swal.fire({
-                icon: 'success',
-                title: '恭喜通關！',
-                text: `你已完成所有關卡！\n總分數：${score}，最終生命值：${lives}`,
-                showCancelButton: true,
-                confirmButtonText: '保存紀錄',
-                cancelButtonText: '不保存'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: '請輸入你的名字',
-                        input: 'text',
-                        showCancelButton: true,
-                        confirmButtonText: '保存',
-                        cancelButtonText: '取消'
-                    }).then((inputResult) => {
-                        if (inputResult.value) {
-                            saveScore(inputResult.value, score);
-                            updateLeaderboard();
-                        }
-                        resetGameToMenu();
-                    });
-                } else {
-                    resetGameToMenu();
+            startBtn.removeEventListener("click", startGame);
+            startBtn.addEventListener("click", function () {
+                if (!difficulty) {
+                    alert("請選擇難度！");
+                    return;
                 }
+                if (selectedLevelIndex === null) {
+                    alert("請選擇關卡！");
+                    return;
+                }
+                startGame();
             });
         }
-    }, 2000);
-}
 
 
 
 
 
-function moveToNextLevel() {
-    let selectedLevel;
-
-    // 根據當前難度獲取下一個 Level 的磚塊排列
-    if (difficulty === "easy") {
-        selectedLevel = easyLevels[selectedLevelIndex];
-    } else if (difficulty === "medium") {
-        selectedLevel = mediumLevels[selectedLevelIndex];
-    } else if (difficulty === "hard") {
-        selectedLevel = hardLevels[selectedLevelIndex];
-    }
-
-    // 重置球的速度為初始值
-    resetSpeed();  // 強制重置速度到預設值
-
-    // 根據選擇的磚塊排列開始下一關
-    startGame(selectedLevel.brickArrangement);
-}
 
 
-
-function resetGame() {
-    // 重置相關的狀態
-    score = 0;
-    lives = 3;
-    isLevelComplete = false;  // 重置過關狀態
-}
-
-
-function drawTimer() {
-    ctx.font = "16px Arial";
-    ctx.fillStyle = "#0095DD";
-    ctx.textAlign = "right";  // 右對齊
-    ctx.fillText("剩餘秒數 " + timeRemaining, canvas.width - 10, canvas.height - 10);  // 右下角顯示時間
-}
-
-
-
-function checkForReward() {
-    // 當分數達到下一次獎勵門檻時，發放獎勵
-    if (score >= nextRewardScore) {
-        // 更新下一次獎勵的分數門檻
-        nextRewardScore += scoreThreshold;
-
-        // 隨機選擇延長時間或增加生命
-        const reward = Math.random() < 0.5 ? 'time' : 'life';
-
-        if (reward === 'time') {
-            extendTime();  // 增加時間
-        } else {
-            addLife();  // 增加生命
+        function drawLives() {
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#0095DD";
+            ctx.fillText("生命值：" + lives, canvas.width - 90, 20);  // 顯示當前生命值
         }
-    }
-}
 
-
-
-
-
-
-
-function extendTime() {
-    timeRemaining += 10;  // 增加10秒
-    let maxTimeLimit = timeLimit * 2;  // 設置最大時間限制
-    if (timeRemaining > maxTimeLimit) {
-        timeRemaining = maxTimeLimit;
-    }
-}
-
-function addLife() {
-    lives++;  // 增加一條生命
-}
-
-
-function generateDefaultBricks(difficulty) {
-    bricks = [];  // 清空磚塊陣列
-    brickWidth = (canvas.width - (brickColumnCount - 1) * brickPadding - 2 * brickOffsetLeft) / brickColumnCount;
-
-    for (let c = 0; c < brickColumnCount; c++) {
-        bricks[c] = [];
-        for (let r = 0; r < brickRowCount; r++) {
-            let hitPoints = 1;
-            if (difficulty === "medium" && Math.random() < 0.5) {
-                hitPoints = 2;  // 中等模式下部分磚塊需要2次擊打
-            } else if (difficulty === "hard") {
-                hitPoints = Math.floor(Math.random() * 3) + 1;  // 困難模式隨機生成1到3次擊打的磚塊
+        function checkAllBricksCleared() {
+            for (let c = 0; c < bricks.length; c++) {
+                for (let r = 0; r < bricks[c].length; r++) {
+                    if (bricks[c][r].status === 1) {
+                        return false;  // 還有磚塊存在
+                    }
+                }
             }
-            bricks[c][r] = { x: 0, y: 0, status: 1, hitPoints: hitPoints };
+            return true;  // 所有磚塊已被擊破
         }
-    }
-}
 
-function startNextLevel() {
-    let selectedLevel;
+        function drawLevelComplete() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);  // 清除畫布
 
-    // 根據難度獲取對應的關卡
-    if (difficulty === "easy") {
-        selectedLevel = easyLevels[selectedLevelIndex];
-    } else if (difficulty === "medium") {
-        selectedLevel = mediumLevels[selectedLevelIndex];
-    } else if (difficulty === "hard") {
-        selectedLevel = hardLevels[selectedLevelIndex];
-    }
+            ctx.font = "24px Arial";
+            ctx.fillStyle = "#000000";
+            ctx.textAlign = "center";  // 使文字居中對齊
 
-    // 重置球的位置和速度，但保留 comboCount
-    resetSpeed();
-    x = canvas.width / 2;
-    y = canvas.height - 30;
-    isRunning = false;
-    startGame(selectedLevel.brickArrangement); // 傳入新的磚塊排列，開始下一關
-}
+            // 顯示 "恭喜過關！" 和 "最終分數"
+            ctx.fillText("恭喜過關！", canvas.width / 2, canvas.height / 2 - 20);
+            ctx.fillText("你的分數: " + score, canvas.width / 2, canvas.height / 2 + 20);
+
+            // 延遲2秒後自動進入下一關
+            setTimeout(() => {
+                moveToNextLevel();
+            }, 2000);  // 延遲2秒後開始下一關
+        }
 
 
+        function handleLevelComplete() {
+            isLevelComplete = true;
+            drawLevelComplete();  // 顯示過關訊息
 
-function resetGameToMenu() {
-    isRunning = false;
+            // 停止計時器和動畫循環
+            clearInterval(timerInterval);
+            cancelAnimationFrame(animationId);
 
-     // 顯示主題更換相關按鈕
-     uploadBrickThemeBtn.style.display = 'block';
-    resetBrickThemeBtn.style.display = 'block';
+            setTimeout(() => {
+                if (selectedLevelIndex < 2) {
+                    selectedLevelIndex++;
+                    isRunning = false;
+                    startNextLevel();
+                } else {
+                    // 已完成最後一關時提示保存紀錄
+                    Swal.fire({
+                        icon: 'success',
+                        title: '恭喜通關！',
+                        text: `你已完成所有關卡！\n總分數：${score}，最終生命值：${lives}`,
+                        showCancelButton: true,
+                        confirmButtonText: '保存紀錄',
+                        cancelButtonText: '不保存'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: '請輸入你的名字',
+                                input: 'text',
+                                showCancelButton: true,
+                                confirmButtonText: '保存',
+                                cancelButtonText: '取消'
+                            }).then((inputResult) => {
+                                if (inputResult.value) {
+                                    saveScore(inputResult.value, score);
+                                    updateLeaderboard();
+                                }
+                                resetGameToMenu();
+                            });
+                        } else {
+                            resetGameToMenu();
+                        }
+                    });
+                }
+            }, 2000);
+        }
 
-    // 停止音樂
-    const backgroundMusic = document.getElementById("backgroundMusic");
-    backgroundMusic.pause();
-    backgroundMusic.currentTime = 0;
 
-    // 清除畫布並停止動畫循環
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    cancelAnimationFrame(animationId);
-    clearInterval(timerInterval);  // 停止計時器
-    canvas.style.display = "none";  // 隱藏畫布
 
-    // 停止音效
-    const hitSound = document.getElementById("hitSound");
-    hitSound.pause();
-    hitSound.currentTime = 0;
 
-    // 重置遊戲狀態
-    score = 0;
-    lives = 3;
-    isGameOver = false;
-    isLevelComplete = false;
-    selectedLevelIndex = null;
-    difficulty = null;
 
-    // 確保停止所有彈窗和畫布
-    Swal.close();  // 確保任何彈窗都被關閉
+        function moveToNextLevel() {
+            let selectedLevel;
 
-    // 重設所有按鈕樣式
-    resetButtons();
+            // 根據當前難度獲取下一個 Level 的磚塊排列
+            if (difficulty === "easy") {
+                selectedLevel = easyLevels[selectedLevelIndex];
+            } else if (difficulty === "medium") {
+                selectedLevel = mediumLevels[selectedLevelIndex];
+            } else if (difficulty === "hard") {
+                selectedLevel = hardLevels[selectedLevelIndex];
+            }
 
-    // 顯示主選單
-    document.getElementById("difficultyButtons").style.display = "block";
-    document.getElementById("levelButtons").style.display = "block";
-    startBtn.style.display = "block";
+            // 重置球的速度為初始值
+            resetSpeed();  // 強制重置速度到預設值
 
-        // 重置 combo 計數器
-        comboCount = 0;
-    comboBonus = 0;
+            // 根據選擇的磚塊排列開始下一關
+            startGame(selectedLevel.brickArrangement);
+        }
 
-    // 清除舊事件，並重新綁定一次 startBtn 的點擊事件
-    startBtn.removeEventListener("click", startGame); // 避免多次綁定
-    startBtn.addEventListener("click", () => {
-        // 檢查難度和關卡是否選擇
-        if (!difficulty) {
-            Swal.fire({
-                icon: 'warning',
-                title: '選擇難度',
-                text: '請選擇難度！'
+
+
+        function resetGame() {
+            // 重置相關的狀態
+            score = 0;
+            lives = 3;
+            isLevelComplete = false;  // 重置過關狀態
+        }
+
+
+        function drawTimer() {
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#0095DD";
+            ctx.textAlign = "right";  // 右對齊
+            ctx.fillText("剩餘秒數 " + timeRemaining, canvas.width - 10, canvas.height - 10);  // 右下角顯示時間
+        }
+
+
+
+        function checkForReward() {
+            // 當分數達到下一次獎勵門檻時，發放獎勵
+            if (score >= nextRewardScore) {
+                // 更新下一次獎勵的分數門檻
+                nextRewardScore += scoreThreshold;
+
+                // 隨機選擇延長時間或增加生命
+                const reward = Math.random() < 0.5 ? 'time' : 'life';
+
+                if (reward === 'time') {
+                    extendTime();  // 增加時間
+                } else {
+                    addLife();  // 增加生命
+                }
+            }
+        }
+
+
+
+
+
+
+
+        function extendTime() {
+            timeRemaining += 10;  // 增加10秒
+            let maxTimeLimit = timeLimit * 2;  // 設置最大時間限制
+            if (timeRemaining > maxTimeLimit) {
+                timeRemaining = maxTimeLimit;
+            }
+        }
+
+        function addLife() {
+            lives++;  // 增加一條生命
+        }
+
+
+        function generateDefaultBricks(difficulty) {
+            bricks = [];  // 清空磚塊陣列
+            brickWidth = (canvas.width - (brickColumnCount - 1) * brickPadding - 2 * brickOffsetLeft) / brickColumnCount;
+
+            for (let c = 0; c < brickColumnCount; c++) {
+                bricks[c] = [];
+                for (let r = 0; r < brickRowCount; r++) {
+                    let hitPoints = 1;
+                    if (difficulty === "medium" && Math.random() < 0.5) {
+                        hitPoints = 2;  // 中等模式下部分磚塊需要2次擊打
+                    } else if (difficulty === "hard") {
+                        hitPoints = Math.floor(Math.random() * 3) + 1;  // 困難模式隨機生成1到3次擊打的磚塊
+                    }
+                    bricks[c][r] = { x: 0, y: 0, status: 1, hitPoints: hitPoints };
+                }
+            }
+        }
+
+        function startNextLevel() {
+            let selectedLevel;
+
+            // 根據難度獲取對應的關卡
+            if (difficulty === "easy") {
+                selectedLevel = easyLevels[selectedLevelIndex];
+            } else if (difficulty === "medium") {
+                selectedLevel = mediumLevels[selectedLevelIndex];
+            } else if (difficulty === "hard") {
+                selectedLevel = hardLevels[selectedLevelIndex];
+            }
+
+            // 重置球的位置和速度，但保留 comboCount
+            resetSpeed();
+            x = canvas.width / 2;
+            y = canvas.height - 30;
+            isRunning = false;
+            startGame(selectedLevel.brickArrangement); // 傳入新的磚塊排列，開始下一關
+        }
+
+
+
+        function resetGameToMenu() {
+            isRunning = false;
+
+            // 顯示主題更換相關按鈕
+            uploadBrickThemeBtn.style.display = 'block';
+            resetBrickThemeBtn.style.display = 'block';
+
+            // 停止音樂
+            const backgroundMusic = document.getElementById("backgroundMusic");
+            backgroundMusic.pause();
+            backgroundMusic.currentTime = 0;
+
+            // 清除畫布並停止動畫循環
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            cancelAnimationFrame(animationId);
+            clearInterval(timerInterval);  // 停止計時器
+            canvas.style.display = "none";  // 隱藏畫布
+
+            // 停止音效
+            const hitSound = document.getElementById("hitSound");
+            hitSound.pause();
+            hitSound.currentTime = 0;
+
+            // 重置遊戲狀態
+            score = 0;
+            lives = 3;
+            isGameOver = false;
+            isLevelComplete = false;
+            selectedLevelIndex = null;
+            difficulty = null;
+
+            // 確保停止所有彈窗和畫布
+            Swal.close();  // 確保任何彈窗都被關閉
+
+            // 重設所有按鈕樣式
+            resetButtons();
+
+            // 顯示主選單
+            document.getElementById("difficultyButtons").style.display = "block";
+            document.getElementById("levelButtons").style.display = "block";
+            startBtn.style.display = "block";
+
+            // 重置 combo 計數器
+            comboCount = 0;
+            comboBonus = 0;
+
+            // 清除舊事件，並重新綁定一次 startBtn 的點擊事件
+            startBtn.removeEventListener("click", startGame); // 避免多次綁定
+            startBtn.addEventListener("click", () => {
+                // 檢查難度和關卡是否選擇
+                if (!difficulty) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '選擇難度',
+                        text: '請選擇難度！'
+                    });
+                    return;
+                }
+                if (selectedLevelIndex === null) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '選擇關卡',
+                        text: '請選擇Level！'
+                    });
+                    return;
+                }
+                startGame();
             });
-            return;
         }
-        if (selectedLevelIndex === null) {
-            Swal.fire({
-                icon: 'warning',
-                title: '選擇關卡',
-                text: '請選擇Level！'
+
+
+
+
+
+
+        // 完整的 resetButtons 函數，包含按鈕樣式和狀態重置
+        function resetButtons() {
+            // 獲取難度和關卡按鈕元素
+            const difficultyButtons = ["easyBtn", "mediumBtn", "hardBtn"];
+            const levelButtons = ["level1Btn", "level2Btn", "level3Btn"];
+
+            // 移除難度按鈕的 "active" 樣式並啟用按鈕
+            difficultyButtons.forEach(id => {
+                const btn = document.getElementById(id);
+                btn.classList.remove("active");
+                btn.disabled = false; // 確保按鈕處於啟用狀態
             });
-            return;
+
+            // 移除關卡按鈕的 "active" 樣式並啟用按鈕
+            levelButtons.forEach(id => {
+                const btn = document.getElementById(id);
+                btn.classList.remove("active");
+                btn.disabled = false; // 確保按鈕處於啟用狀態
+            });
+
+            // 顯示難度和關卡選擇按鈕容器
+            document.getElementById("difficultyButtons").style.display = "block";
+            document.getElementById("levelButtons").style.display = "block";
         }
-        startGame();
-    });
-}
 
 
 
+        function increaseBallSpeed() {
+            const speedIncrement = 0.2;  // 每次擊中磚塊後的速度增量
+            const maxSpeed = 4;  // 設定最大速度，防止球速度過快
 
-
-
-// 完整的 resetButtons 函數，包含按鈕樣式和狀態重置
-function resetButtons() {
-    // 獲取難度和關卡按鈕元素
-    const difficultyButtons = ["easyBtn", "mediumBtn", "hardBtn"];
-    const levelButtons = ["level1Btn", "level2Btn", "level3Btn"];
-
-    // 移除難度按鈕的 "active" 樣式並啟用按鈕
-    difficultyButtons.forEach(id => {
-        const btn = document.getElementById(id);
-        btn.classList.remove("active");
-        btn.disabled = false; // 確保按鈕處於啟用狀態
-    });
-
-    // 移除關卡按鈕的 "active" 樣式並啟用按鈕
-    levelButtons.forEach(id => {
-        const btn = document.getElementById(id);
-        btn.classList.remove("active");
-        btn.disabled = false; // 確保按鈕處於啟用狀態
-    });
-
-    // 顯示難度和關卡選擇按鈕容器
-    document.getElementById("difficultyButtons").style.display = "block";
-    document.getElementById("levelButtons").style.display = "block";
-}
-
-
-
-function increaseBallSpeed() {
-    const speedIncrement = 0.2;  // 每次擊中磚塊後的速度增量
-    const maxSpeed = 4;  // 設定最大速度，防止球速度過快
-
-    // 增加水平和垂直方向的速度，並設置最大值限制
-    if (Math.abs(dx) < maxSpeed) {
-        dx += (dx > 0 ? speedIncrement : -speedIncrement); // 避免速度超過 maxSpeed
-    }
-    if (Math.abs(dy) < maxSpeed) {
-        dy += (dy > 0 ? speedIncrement : -speedIncrement);
-    }
-}
-
-
-function resetSpeed() {
-    dx = 2;  // 初始水平速度
-    dy = -2;  // 初始垂直速度
-}
-
-// 在球碰到擋板時重置連擊
-function checkPaddleCollision() {
-    if (y + ballRadius >= paddleY && x > paddleX && x < paddleX + paddleWidth) {
-        dy = -dy;  // 擋板反彈
-        y = paddleY - ballRadius;  // 確保球不會進入擋板
-
-        // 擋板碰撞後重置連擊
-        comboCount = 0;
-        comboBonus = 0;
-    }
-}
-
-
-// 檢查球是否掉到底部，並重置連擊
-function checkBallFall() {
-    if (y + ballRadius > canvas.height) {
-        lives--;  // 只在這裡扣除一條生命
-        comboCount = 0;  // 重置 combo 計數
-
-        if (lives === 0) {
-            isGameOver = true;  // 生命用完，遊戲結束
-        } else {
-            resetBall();  // 重置球的位置和速度
+            // 增加水平和垂直方向的速度，並設置最大值限制
+            if (Math.abs(dx) < maxSpeed) {
+                dx += (dx > 0 ? speedIncrement : -speedIncrement); // 避免速度超過 maxSpeed
+            }
+            if (Math.abs(dy) < maxSpeed) {
+                dy += (dy > 0 ? speedIncrement : -speedIncrement);
+            }
         }
-    }
-}
+
+
+        function resetSpeed() {
+            dx = 2;  // 初始水平速度
+            dy = -2;  // 初始垂直速度
+        }
+
+        // 在球碰到擋板時重置連擊
+        function checkPaddleCollision() {
+            if (y + ballRadius >= paddleY && x > paddleX && x < paddleX + paddleWidth) {
+                dy = -dy;  // 擋板反彈
+                y = paddleY - ballRadius;  // 確保球不會進入擋板
+
+                // 擋板碰撞後重置連擊
+                comboCount = 0;
+                comboBonus = 0;
+            }
+        }
+
+
+        // 檢查球是否掉到底部，並重置連擊
+        function checkBallFall() {
+            if (y + ballRadius > canvas.height) {
+                lives--;  // 只在這裡扣除一條生命
+                comboCount = 0;  // 重置 combo 計數
+
+                if (lives === 0) {
+                    isGameOver = true;  // 生命用完，遊戲結束
+                } else {
+                    resetBall();  // 重置球的位置和速度
+                }
+            }
+        }
 
 
 
-function drawScore() {
-    ctx.font = "16px Arial";
-    ctx.fillStyle = "#0095DD";
-    ctx.fillText("分數: " + score, 10, 20);
-    // 移除顯示 Combo 的代碼
-}
+        function drawScore() {
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#0095DD";
+            ctx.fillText("分數: " + score, 10, 20);
+            // 移除顯示 Combo 的代碼
+        }
 
-function drawCombo() {
-    ctx.font = "16px Arial";
-    ctx.fillStyle = "#0095DD";  // 文字顏色
-    ctx.textAlign = "left";  // 將文字對齊至左側
-    ctx.fillText("連擊: x" + comboCount, 10, canvas.height - 10);  // 左下角顯示 combo 計數
-}
+        function drawCombo() {
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#0095DD";  // 文字顏色
+            ctx.textAlign = "left";  // 將文字對齊至左側
+            ctx.fillText("連擊: x" + comboCount, 10, canvas.height - 10);  // 左下角顯示 combo 計數
+        }
 
-function createExplosion(x, y) {
-    let particleCount = 20;  // 爆炸粒子的數量
-    for (let i = 0; i < particleCount; i++) {
-        particles.push({
-            x: x,
-            y: y,
-            vx: (Math.random() - 0.5) * 2,  // 粒子的水平速度
-            vy: (Math.random() - 0.5) * 2,  // 粒子的垂直速度
-            alpha: 1,  // 粒子的透明度
-            radius: Math.random() * 3 + 1  // 粒子的半徑
-        });
-    }
-}
-function updateParticles() {
-    for (let i = 0; i < particles.length; i++) {
-        let p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -= 0.02;  // 逐漸減少透明度讓粒子淡出
+        function createExplosion(x, y) {
+            let particleCount = 20;  // 爆炸粒子的數量
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 2,  // 粒子的水平速度
+                    vy: (Math.random() - 0.5) * 2,  // 粒子的垂直速度
+                    alpha: 1,  // 粒子的透明度
+                    radius: Math.random() * 3 + 1  // 粒子的半徑
+                });
+            }
+        }
+        function updateParticles() {
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.02;  // 逐漸減少透明度讓粒子淡出
 
-        // 繪製粒子
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 165, 0, ${p.alpha})`;  // 橙色粒子
-        ctx.fill();
-        ctx.closePath();
-    }
+                // 繪製粒子
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 165, 0, ${p.alpha})`;  // 橙色粒子
+                ctx.fill();
+                ctx.closePath();
+            }
 
-    // 移除透明度為0的粒子
-    particles = particles.filter(p => p.alpha > 0);
-}
+            // 移除透明度為0的粒子
+            particles = particles.filter(p => p.alpha > 0);
+        }
 
-function toggleMusic() {
-    if (isMusicPlaying) {
-        backgroundMusic.pause();
-        musicControlBtn.src = "image/禁止播放狀態.jpg";  // 切換至禁用圖標
-    } else {
-        backgroundMusic.play();
-        musicControlBtn.src = "image/播放狀態.jpg";  // 切換至播放圖標
-    }
-    isMusicPlaying = !isMusicPlaying;  // 切換狀態
-}
-
-
-function saveScore(playerName, score) {
-    const now = new Date();
-    const formattedDate = `${now.getFullYear()}年${String(now.getMonth() + 1).padStart(2, '0')}月${String(now.getDate()).padStart(2, '0')}日 ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-    const playerData = {
-        name: playerName,
-        score: score,
-        difficulty: difficulty,
-        level: selectedLevelIndex + 1,
-        lives: lives,
-        date: formattedDate
-    };
-
-    const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
-    leaderboard.push(playerData);
-    leaderboard.sort((a, b) => b.score - a.score);
-
-    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
-}
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                backgroundMusic.pause();
+                musicControlBtn.src = "image/禁止播放狀態.jpg";  // 切換至禁用圖標
+            } else {
+                backgroundMusic.play();
+                musicControlBtn.src = "image/播放狀態.jpg";  // 切換至播放圖標
+            }
+            isMusicPlaying = !isMusicPlaying;  // 切換狀態
+        }
 
 
+        function saveScore(playerName, score) {
+            const now = new Date();
+            const formattedDate = `${now.getFullYear()}年${String(now.getMonth() + 1).padStart(2, '0')}月${String(now.getDate()).padStart(2, '0')}日 ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-function updateLeaderboard() {
-    const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
-    const leaderboardBody = document.getElementById("leaderboard").querySelector("tbody");
+            const playerData = {
+                name: playerName,
+                score: score,
+                difficulty: difficulty,
+                level: selectedLevelIndex + 1,
+                lives: lives,
+                date: formattedDate
+            };
 
-    leaderboardBody.innerHTML = "";
+            const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+            leaderboard.push(playerData);
+            leaderboard.sort((a, b) => b.score - a.score);
 
-    leaderboard.forEach((player, index) => {
-        const row = document.createElement("tr");
+            localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+        }
 
-        row.innerHTML = `
+
+
+        function updateLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+            const leaderboardBody = document.getElementById("leaderboard").querySelector("tbody");
+
+            leaderboardBody.innerHTML = "";
+
+            leaderboard.forEach((player, index) => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
             <td>${index + 1}</td>
             <td>${player.name}</td>
             <td>${player.score}</td>
@@ -2080,43 +2184,43 @@ function updateLeaderboard() {
             <td>${player.date}</td>
         `;
 
-        leaderboardBody.appendChild(row);
-    });
-}
+                leaderboardBody.appendChild(row);
+            });
+        }
 
 
-// 當頁面載入時，更新排行榜
-document.addEventListener("DOMContentLoaded", updateLeaderboard);
+        // 當頁面載入時，更新排行榜
+        document.addEventListener("DOMContentLoaded", updateLeaderboard);
 
 
-function saveToLeaderboard(name, score, difficulty, level, lives, date) {
-    // 取得現有排行榜資料
-    let leaderboard = JSON.parse(localStorage.getItem('leaderboardData')) || [];
-    
-    // 新增當前紀錄
-    leaderboard.push({
-        name,
-        score,
-        difficulty,
-        level,
-        lives,
-        date
-    });
-    
-    // 儲存回 localStorage
-    localStorage.setItem('leaderboardData', JSON.stringify(leaderboard));
-}
+        function saveToLeaderboard(name, score, difficulty, level, lives, date) {
+            // 取得現有排行榜資料
+            let leaderboard = JSON.parse(localStorage.getItem('leaderboardData')) || [];
 
-function loadLeaderboard() {
-    const leaderboardTable = document.getElementById('leaderboardTable');
-    leaderboardTable.innerHTML = ''; // 先清空表格
+            // 新增當前紀錄
+            leaderboard.push({
+                name,
+                score,
+                difficulty,
+                level,
+                lives,
+                date
+            });
 
-    // 讀取儲存的排行榜資料
-    const leaderboard = JSON.parse(localStorage.getItem('leaderboardData')) || [];
+            // 儲存回 localStorage
+            localStorage.setItem('leaderboardData', JSON.stringify(leaderboard));
+        }
 
-    leaderboard.forEach((entry, index) => {
-        // 使用 HTML 來生成表格列
-        leaderboardTable.innerHTML += `
+        function loadLeaderboard() {
+            const leaderboardTable = document.getElementById('leaderboardTable');
+            leaderboardTable.innerHTML = ''; // 先清空表格
+
+            // 讀取儲存的排行榜資料
+            const leaderboard = JSON.parse(localStorage.getItem('leaderboardData')) || [];
+
+            leaderboard.forEach((entry, index) => {
+                // 使用 HTML 來生成表格列
+                leaderboardTable.innerHTML += `
             <tr>
                 <td>${index + 1}</td>
                 <td>${entry.name}</td>
@@ -2127,15 +2231,15 @@ function loadLeaderboard() {
                 <td>${entry.date}</td>
             </tr>
         `;
-    });
-}
+            });
+        }
 
-document.getElementById('openLeaderboardBtn').addEventListener('click', () => {
-    loadLeaderboard();
-    document.querySelector('.leaderboard-modal').style.display = 'block';
-});
+        document.getElementById('openLeaderboardBtn').addEventListener('click', () => {
+            loadLeaderboard();
+            document.querySelector('.leaderboard-modal').style.display = 'block';
+        });
 
 
-musicListModa
+        musicListModa
 
-    </script>   
+    </script>
